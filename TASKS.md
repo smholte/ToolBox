@@ -7,7 +7,7 @@ waiting (for what) · running · done.
 
 | No. | Title | Status | Who | Branch |
 | --- | --- | --- | --- | --- |
-| 0001 | [Independent review of toolbox format v0.1](tasks/0001-independent-review-of-the-format.md) | running | worker (Claude Code on the web, 18 Nov 2026) | `task/0001-independent-review` |
+| 0001 | [Independent review of toolbox format v0.1](tasks/0001-independent-review-of-the-format.md) | waiting – lead review of the branch; report in the task file | worker (Claude Code on the web, 18 Nov 2026) | `task/0001-independent-review` |
 | 0002 | Trial on the owner's PC – **done by the owner, 18 Nov 2026, Edge 157 on Windows, real folder**: round trip works (small and 100 MB: written in 0.5 s, back in 13 s with an 8 s stand-in bake); after a restart Edge keeps the folder but asks one click ("Allow again"), and after "Allow on every visit" asks nothing. Left: the same once in Chrome; the stand-in's "slowed down" line also fires for its own bake (a wrong message in `trial/`, for task 0001) | done, two small points left | owner + lead | – |
 
 ## Lane: Router (`smholte/ToolBox`)
