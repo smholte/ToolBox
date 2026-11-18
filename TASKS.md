@@ -14,8 +14,9 @@ waiting (for what) · running · done.
 
 | No. | Title | Status | Who | Branch |
 | --- | --- | --- | --- | --- |
-| 0003 | Plan step B: what the router's first version does, split into tasks | plan written: [docs/step-b-router.md](docs/step-b-router.md) – waiting for the owner's answers to its six questions | lead | – |
-| 0004–0009 | The router's first version, six tasks (listed in the plan) | waiting – for 0003's answers; task files are written then | worker | – |
+| 0003 | Plan step B: [docs/step-b-router.md](docs/step-b-router.md), with the owner's six answers | done (18 Nov 2026) | lead | – |
+| 0004 | [The router's skeleton: tray app, drop window, installer, tests](tasks/0004-router-skeleton.md) | waiting – starts when Fresing Render's task 0217 is under way (the owner says when) | worker | `task/0004-router-skeleton` |
+| 0005–0009 | The folder · the popup and routes · jobs · Windows integration and updates · review and the owner's test list (listed in the plan) | waiting – each after the one before; its task file is written then | worker | – |
 
 ## Lane: Window (`smholte/ToolBox`)
 
@@ -24,7 +25,7 @@ Nothing yet; after the router.
 ## Waiting for the owner
 
 - Optional: run the trial once in Chrome too.
-- The six questions at the end of `docs/step-b-router.md`.
+- Say when Fresing Render's task 0217 is under way, so task 0004 can start.
 
 ## Done
 

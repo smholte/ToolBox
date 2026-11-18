@@ -1,7 +1,6 @@
 # Step B – the router: plan for its first version
 
-Written by the lead, 18 Nov 2026 (task 0003). **A plan for the owner to read; nothing is built until he has
-answered the questions at the end.**
+Written by the lead, 18 Nov 2026 (task 0003). **The owner answered its questions the same evening; they are at the end.**
 
 ## What the owner gets
 
@@ -63,15 +62,30 @@ organisation; installing tools from a catalogue; chains and converters; macOS an
 | 0008 | Windows: "Open with" and "Send to", start with Windows, updates from GitHub Releases | right-click → Open with Toolbox works on the owner's PC; an update installs itself |
 | 0009 | Independent review of all Windows-only code, and the owner's test list click by click | the review's findings are fixed or listed; the owner has run the list |
 
-## Questions for the owner
+## Decided by the owner (18 Nov 2026)
 
-1. **Windows only at first?** (Proposed: yes. Fresing Render is Windows only too.)
-2. **The app's name** as people see it: "Toolbox"? "Fresing Toolbox"?
-3. **The Windows warning.** An app that is not signed with a paid certificate shows "Windows protected your PC" at
-   its first install (More info → Run anyway). A certificate costs money every year. Proposed: accept the warning
-   for now, as with any small open-source tool, and say so on the download page. How does Fresing Render handle it
-   today?
-4. **Start with Windows** by default? (Proposed: yes, with a switch in the tray menu.)
-5. **Languages**: English only at first, or Dutch and Norwegian too as House Planner has?
-6. **When?** The router is useful once at least one tool reads its inbox. Proposed: start 0004 when Fresing
-   Render's task 0217 is under way, so the first real test has a real tool on the other side.
+1. **Windows only** at first.
+2. **Name: "Fresing ToolBox"**, for now. Its icon is made like Fresing Render's "Fr" mark, with **Ft** or **FT**:
+   the owner picks from drafts (task 0004).
+3. **Not signed at first.** The installer shows Windows' "Windows protected your PC" warning (More info → Run
+   anyway); the download page says so. Fresing Render is not signed yet either. A signature, when it comes, is one
+   for both apps (see below).
+4. **Starts with Windows** by default, with a switch in the tray menu.
+5. **A language setting from the start, English first.** Every text the user sees comes from one file per
+   language; English is complete in every release, other languages are added to it.
+6. **Start** task 0004 once Fresing Render's task 0217 is under way; the owner says when.
+
+### Signing, when the time comes (looked up 18 Nov 2026)
+
+A code-signing certificate names a publisher, not an app: one covers Fresing Render, Fresing ToolBox and
+anything else Fresing publishes. Three ways, none of which removes the warning on day one – Windows trusts a new
+publisher's files only after enough people have downloaded them:
+
+| Way | Cost | Whose name Windows shows | Note |
+| --- | --- | --- | --- |
+| A certificate from a certificate seller | about 150–300 USD a year | Fresing | the key must live on a token or a signing service, which decides how GitHub can sign |
+| Microsoft's Azure Artifact Signing | about 10 USD a month | Fresing | in the EU only for registered organisations, not for private persons |
+| SignPath Foundation | free for open-source projects | SignPath Foundation | each project applies; open-source licence required; conditions on who may release |
+
+Sources: [Microsoft, code signing options](https://learn.microsoft.com/windows/apps/package-and-deploy/code-signing-options),
+[SignPath Foundation, conditions](https://signpath.org/terms).
