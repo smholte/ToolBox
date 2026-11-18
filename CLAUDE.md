@@ -100,9 +100,13 @@ them.
 | Fresing Render | `smholte/CAD-render-animation` | uses the format from `v0.1` (its task 0217) |
 | Bolted-joint calculator | not made yet | a project and a repository of its own, made when its work starts |
 
-- The ToolBox lead **never writes a task in a neighbour's repository**. It writes a **brief**; the owner carries
-  it; their lead turns it into a task of their own.
-- Answers come back the same way: the owner pastes the lead's reply, or names the task file to read.
+- The ToolBox lead **never writes a task in a neighbour's repository**. It writes a **brief**, as a message in the
+  **lead post**; their lead turns it into a task of their own.
+- **The lead post** (`smholte/lead-post`, private; its `CLAUDE.md` has the rules) is how the leads write to each
+  other. The ToolBox lead reads `toolbox/inbox.md` there at the start of a chat and whenever the owner says "check
+  the post" – that one file, and only the messages it lists. A message it has dealt with moves from the inbox to
+  `toolbox/closed.md`. After sending, it tells the owner in one line which lead has post, so he can nudge that
+  chat. Worker chats never use the lead post.
 - **Never attach or clone `smholte/house-planner-dev`.** It holds the owner's own house. Public samples only.
 
 ## 6. Changing the format
@@ -137,4 +141,6 @@ them.
 - A chat can push branches but not tags; the owner makes tags (18 Nov 2026).
 - A page on GitHub Pages only exists after the owner has turned Pages on in the repository's settings; a chat cannot
   do that and should check that the address answers before sending the owner there (18 Nov 2026).
+- Leads cannot reach each other's chats, and a chat only acts when the owner writes to it. The lead post carries
+  the content; the owner still gives the nudge (18 Nov 2026).
 - More, about the format itself: `toolbox-format/CLAUDE.md`, "Things learned".
