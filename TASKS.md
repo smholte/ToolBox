@@ -7,7 +7,7 @@ waiting (for what) · running · done.
 
 | No. | Title | Status | Who | Branch |
 | --- | --- | --- | --- | --- |
-| 0001 | [Independent review of toolbox format v0.1](tasks/0001-independent-review-of-the-format.md) | open – can start | worker | `task/0001-independent-review` |
+| 0001 | [Independent review of toolbox format v0.1](tasks/0001-independent-review-of-the-format.md) | running | worker (Claude Code on the web, 18 Nov 2026) | `task/0001-independent-review` |
 | 0002 | What the trial on the owner's PC shows: into the format's "Things learned", fixes if needed | waiting – for the owner's report from the trial page | lead writes it then | – |
 
 ## Lane: Router (`smholte/ToolBox`)
