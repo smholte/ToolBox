@@ -14,7 +14,8 @@ waiting (for what) · running · done.
 
 | No. | Title | Status | Who | Branch |
 | --- | --- | --- | --- | --- |
-| 0003 | Plan step B: what the router's first version does, split into tasks | open | lead | – |
+| 0003 | Plan step B: what the router's first version does, split into tasks | plan written: [docs/step-b-router.md](docs/step-b-router.md) – waiting for the owner's answers to its six questions | lead | – |
+| 0004–0009 | The router's first version, six tasks (listed in the plan) | waiting – for 0003's answers; task files are written then | worker | – |
 
 ## Lane: Window (`smholte/ToolBox`)
 
@@ -23,7 +24,7 @@ Nothing yet; after the router.
 ## Waiting for the owner
 
 - Optional: run the trial once in Chrome too.
-- The licence of this repository.
+- The six questions at the end of `docs/step-b-router.md`.
 
 ## Done
 

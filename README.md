@@ -17,3 +17,9 @@ the apps of the next steps.
 
 Tools that use the format are projects of their own: House Planner, Fresing Render, and later a bolted-joint
 calculator.
+
+The plan for step B: [`docs/step-b-router.md`](docs/step-b-router.md).
+
+## Licence
+
+MIT, © 2026 Fresing – see [`LICENSE`](LICENSE).

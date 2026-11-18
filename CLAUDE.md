@@ -130,7 +130,7 @@ them.
   checker; all code that only runs on Windows.
 - Claims about speed or size are measured, with the machine named.
 - Licences: a repository says its licence before others copy from it. Nothing comes in under a licence that stops
-  the owner's other apps from using it. (`toolbox-format`: MIT. This repository: not decided yet.)
+  the owner's other apps from using it. (`toolbox-format` and this repository: MIT.)
 
 ## 8. Things learned the hard way
 
