@@ -2,7 +2,7 @@
 
 **Who:** worker · **Status:** waiting – starts when Fresing Render's task 0217 is under way (the owner says when) · **Lane:** Router
 **Repository it changes:** `smholte/ToolBox` · **Branch:** `task/0004-router-skeleton`
-**Started by:** lead, 18 Nov 2026 · **Model:** Opus · effort High · **Merge:** worker merges after a green GitHub run
+**Started by:** lead, 18 Nov 2026 · **Model:** Opus · effort High · **Environment:** add `smholte/Fresing` (read only) · **Merge:** worker merges after a green GitHub run
 
 ## Goal
 
@@ -18,10 +18,15 @@ installer, the tests on GitHub (also on Windows), the texts in a language file, 
 - Fresing Render's installer (`smholte/CAD-render-animation`, `installer/`, public) installs per user without
   admin rights and updates from GitHub Releases. Read how it does it; do not copy its code without its lead's OK
   (it is GPL-3.0-or-later, this repository is MIT) – the same behaviour with Electron's own tools is the aim.
-- The icon: Fresing Render's mark is "Fr", the first two letters of the Fresing word mark with its green swoosh,
-  on a dark rounded square (`site/brand/fresing-render/` there: README.txt, the SVG; Fresing Green `#479B29`,
-  Charcoal `#252E36`, ground `#1A2027`). Fresing ToolBox gets the same F and swoosh with a **t** or **T**. The
-  word mark has no t: it is drawn new, in the same stroke width, corner radii and slanted ends as the r.
+- **The icon (decided by the owner, 18 Nov 2026): "Ft"** – the rule for every Fresing app mark is F + the app's
+  lowercase initial. The F (stem and green swoosh) comes unchanged from the master outlines. The **t is drawn new to
+  the word mark's construction**: stems 35, horizontal strokes 30, outer radius 52, inner radius 16, x-height 171
+  (master units), free stroke ends cut at 22.8° from vertical; drawn beside the master r so the weight matches. White
+  letters, Fresing Green `#479B29` swoosh, on the rounded Deep Charcoal `#1A2027` square of the Fresing app icon (same
+  square, corner radius and padding); readable at 16 px. The specification and the logo files are in
+  **`smholte/Fresing`**, `brand/Fresing-Brand-Specification.md` §4.6–4.7 and `brand/logo/` – read them there (that
+  repository must be in this task's environment, read only). Once the owner approves the t, its outline goes into the
+  report for the Fresing lead (the ToolBox lead sends it on).
 
 ## The work
 
@@ -32,8 +37,8 @@ installer, the tests on GitHub (also on Windows), the texts in a language file, 
    accepts a dropped file and for now only shows its name and size.
 3. **Texts:** every text the user sees comes from `app/lang/en.json`; a language setting in the tray menu that lists
    the language files present; a test that no text is written straight into the code and that every key is used.
-4. **Icon drafts for the owner to choose from:** three drafts as SVG and as a picture in the report – "Ft", "FT",
-   and the better of the two with a different t. After his choice: the `.ico` (16 to 256 px), the tray icon (16,
+4. **Icon drafts for the owner to choose from:** "Ft" with three drafts of the t (all within the construction
+   above, e.g. different crossbar length or top), as SVG and as a picture in the report. After his choice: the `.ico` (16 to 256 px), the tray icon (16,
    20, 24, 32 px, drawn on whole pixels), PNGs for the page. **Stop for the owner here** ("WAITING FOR YOU:") with
    the picture; go on with a placeholder so the rest is not blocked.
 5. **The installer:** per user, no admin rights, into the user's own app folder, with a Start-menu entry and an

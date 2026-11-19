@@ -84,7 +84,7 @@ publisher's files only after enough people have downloaded them:
 | Way | Cost | Whose name Windows shows | Note |
 | --- | --- | --- | --- |
 | A certificate from a certificate seller | about 150–300 USD a year | Fresing | the key must live on a token or a signing service, which decides how GitHub can sign |
-| Microsoft's Azure Artifact Signing | about 10 USD a month | Fresing | in the EU only for registered organisations, not for private persons |
+| Microsoft's Azure Artifact Signing | about 10 USD a month | Fresing | **not open to Fresing for now** (Fresing lead, 18 Nov 2026): organisations younger than three years are refused, and the regions have been narrowed; check Microsoft's current terms before deciding |
 | SignPath Foundation | free for open-source projects | SignPath Foundation | each project applies; open-source licence required; conditions on who may release |
 
 Sources: [Microsoft, code signing options](https://learn.microsoft.com/windows/apps/package-and-deploy/code-signing-options),

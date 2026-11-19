@@ -1,6 +1,6 @@
 # 0001 – Independent review of toolbox format v0.1
 
-**Who:** worker · **Status:** waiting – lead review of the branch · **Lane:** Format
+**Who:** worker · **Status:** done – lead review 19 Nov 2026: fits v0.1.1, pull request #1 · **Lane:** Format
 **Repository it changes:** `smholte/toolbox-format` · **Branch:** `task/0001-independent-review`
 **Started by:** lead, 18 Nov 2026 · **Model:** Opus · effort High · **Merge:** lead review before merge
 

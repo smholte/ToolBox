@@ -51,6 +51,30 @@ where, which model and which effort, and with the permission to push in it, for 
 A worker that has to stop for the owner pushes its branch first and says so in one line starting
 **"WAITING FOR YOU:"**.
 
+**The lead picks model, effort and place for every task** (owner's rule, 19 Nov 2026, as in Fresing Render) and
+writes them in the task file's header, in the "Who" column of `TASKS.md` and above the sentence it gives the owner.
+Place: workers in Claude Code on the web, environment "ToolBox"; the lead in the project chat.
+
+- **Model.** **Sonnet** (uses less of the owner's usage) for routine work: texts, small fixes, extra tests, scripts
+  and checks, work along an existing pattern. **Opus** for hard work: format rules, anything in two languages that
+  must agree, Windows-only code, new designs, anything where a wrong choice is expensive.
+- **Effort.** **High:** new designs, format rules, reviews. **Medium:** features along an existing pattern, small
+  fixes, extra tests, the lead's own work. **Low:** texts and data. Extra high and Max are not used by default.
+- **Stuck** (the same tests failing again and again): first one step more effort; still stuck: Sonnet → Opus.
+  When unsure at the start: the lower choice.
+
+**The lead tells the owner when to start a new lead chat**, unasked and every time (owner's rule, 19 Nov 2026):
+long chats cost the most, because every message carries the whole conversation. When its conversation has grown
+long – large documents or many files read, many tool results, or about 15–20 exchanges – it first brings
+`TASKS.md` and the status note up to date, then gives this sentence for the new chat in the claude.ai project:
+
+> You are the lead chat for ToolBox. Read CLAUDE.md and TASKS.md in github.com/smholte/ToolBox, the project note
+> claude/toolbox-status.md, and your inbox in github.com/smholte/lead-post (toolbox/inbox.md). You plan, write
+> tasks and briefs, and review finished tasks; you don't build or test.
+
+A worker whose session grows very long before its task is done pushes its branch, writes the state in its task
+file's report and tells the owner to continue in a new session with "… and continue task NNNN from its branch".
+
 **Chats share nothing but GitHub.** Everything another chat needs must be in a repository: this file, `TASKS.md`,
 the task file, the code. (Chats inside the claude.ai project also see its documents; do not rely on them for
 anything a worker needs.)
@@ -141,6 +165,8 @@ them.
 - A chat can push branches but not tags; the owner makes tags (18 Nov 2026).
 - A page on GitHub Pages only exists after the owner has turned Pages on in the repository's settings; a chat cannot
   do that and should check that the address answers before sending the owner there (18 Nov 2026).
+- A chat may be refused a push to `main` of another repository by Claude's own safety check; open a pull request
+  instead (GitHub REST API) and let the owner merge it (19 Nov 2026).
 - Leads cannot reach each other's chats, and a chat only acts when the owner writes to it. The lead post carries
   the content; the owner still gives the nudge (18 Nov 2026).
 - More, about the format itself: `toolbox-format/CLAUDE.md`, "Things learned".
