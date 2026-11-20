@@ -16,7 +16,9 @@ only Windows can answer. This task does W1, W4 and W5; W2 and W3 need Python on 
 own Windows tests instead (the lead tells that lead).
 
 - **W1** Which of these names can be made as a file in a normal folder, and does it really make a file (not open a
-  device): `con .txt`, `COM0.txt`, `LPT0.txt`, `COM¹.txt`, `LPT³.txt`, `CONIN$`, `CONOUT$`, `con.txt.txt`, `aux`.
+  device): `con .txt`, `COM0.txt`, `LPT0.txt`, `COM¹.txt`, `COM².txt`, `COM³.txt`, `LPT¹.txt`, `LPT².txt`,
+  `LPT³.txt`, `CONIN$`, `CONOUT$`, `CLOCK$`, `con.txt.txt`, `aux`. (`CLOCK$` and the other superscript digits added
+  20 Nov 2026, from Fresing Render's task 0217; task 0011's P4 uses all of them.)
 - **W4** A path longer than 260 characters: make
   `%USERPROFILE%\Toolbox-check\tools\<80 characters>\inbox\<64 characters>\<120 characters>.txt`, write and read it,
   delete it. Also report whether "long paths" are switched on in Windows.
