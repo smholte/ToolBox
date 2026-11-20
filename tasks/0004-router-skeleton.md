@@ -1,6 +1,6 @@
 # 0004 – The router's skeleton: tray app, drop window, installer, tests
 
-**Who:** worker · **Status:** waiting for the owner – icon choice and his PC test (everything else done, 20 Nov 2026) · **Lane:** Router
+**Who:** worker · **Status:** waiting for the owner – his PC test (icon chosen: A9; everything else done, 20 Nov 2026) · **Lane:** Router
 **Repository it changes:** `smholte/ToolBox` · **Branch:** `task/0004-router-skeleton`
 **Started by:** lead, 18 Nov 2026 · **Model:** Opus · effort High · **Environment:** add `smholte/Fresing` (read only) · **Merge:** worker merges after a green GitHub run
 
@@ -55,13 +55,13 @@ installer, the tests on GitHub (also on Windows), the texts in a language file, 
 ## Done when
 
 - [ ] The installed app shows its tray icon on GitHub's Windows machine (the test) and on the owner's PC (his steps)
-- [ ] One instance only; the drop window shows a dropped file's name and size; Quit really quits
-- [ ] Start with Windows can be switched off and stays off after a restart of the app
-- [ ] All texts come from `en.json`; the two text tests pass
-- [ ] The owner has chosen the icon; the chosen icon is in the app, the installer and `brand/`
-- [ ] Install and uninstall leave nothing behind on GitHub's Windows machine
-- [ ] Windows-only code reviewed by a helper or chat that did not write it
-- [ ] `CLAUDE.md` section 3 (layout) and a new section on tests are current; report below filled in
+- [x] One instance only; the drop window shows a dropped file's name and size; Quit really quits
+- [x] Start with Windows can be switched off and stays off after a restart of the app
+- [x] All texts come from `en.json`; the two text tests pass
+- [x] The owner has chosen the icon; the chosen icon is in the app, the installer and `brand/`
+- [x] Install and uninstall leave nothing behind on GitHub's Windows machine
+- [x] Windows-only code reviewed by a helper or chat that did not write it
+- [x] `CLAUDE.md` section 3 (layout) and a new section on tests are current; report below filled in
 
 ## Not in this task
 
@@ -74,8 +74,8 @@ updates (0008); signing; macOS and Linux installers; the window with web tools (
 
 **Chat / date:** worker chat (Claude Code on the web), 20 Nov 2026. Branch `task/0004-router-skeleton`.
 
-**State: WAITING FOR THE OWNER** – the icon choice (A or one of A2–A12, rounds 2 and 3) and his test on his PC. Everything else is done and
-green on GitHub. The app carries draft **A** as a placeholder until he chooses.
+**State: WAITING FOR THE OWNER** – his test on his PC. He chose the icon (**A9**, 20 Nov 2026); everything else is
+done and green on GitHub.
 
 **What changed:**
 
@@ -146,6 +146,23 @@ all with the crossbar on both sides of the stem (`brand/drafts/ft-drafts-2.png`,
 
 At 16–24 px these differ little from A (one pixel at most); the choice is about the large icon.
 
+**The owner's choice: A9** (20 Nov 2026) – A with the foot ending exactly below the crossbar's end. It is in the
+app (tray icon, window icon), the installer and its shortcuts (`brand/fresing-toolbox.ico`) and `brand/`
+(`ft-app-icon.svg`, PNGs 16–1024 px). `CHOSEN = "A9"` in `tools/make_icons.py`.
+
+**For the Fresing lead (through the ToolBox lead):** the t of A9 in master units, the same coordinates as the F of
+the Fresing master (baseline 242, x-height line 71, F stem from x 0):
+
+```
+M214 40 L214 71 L188 71 L175.4 101 L214 101 L214 190 A52 52 0 0 0 266 242 L296.4 242 L309 212 L265 212
+A16 16 0 0 1 249 196 L249 101 L296.4 101 L309 71 L249 71 L249 40 Z
+```
+
+Stem 35 (x 214–249), from y 40 (the swoosh's lower edge) to the baseline; crossbar 30 (y 71–101), 26 to the left
+and 60 to the right of the stem, both ends cut at 22.8°; foot 30 (y 212–242) ending below the crossbar's end, cut
+at 22.8°; outer radius 52, inner radius 16. On the app-icon square the whole mark is scaled 1.203883 and moved
+(70, 110.33): `brand/ft-app-icon.svg`. 16, 20 and 24 px are drawn on whole pixels (`tools/make_icons.py`).
+
 **Note on the source of the F:** `smholte/Fresing` could not be added to this session (refused by the session's
 safety check), so the brand specification §4.6–4.7 was not read. The F's outline was taken from the public Fresing
 Render app mark (`site/brand/fresing-render/fresing-render-app-icon.svg` in `smholte/CAD-render-animation`, "from
@@ -183,12 +200,9 @@ bar 30, radii 52/16, 22.8° cuts). The Fresing lead may want to check the drafts
 
 **Steps for the owner** (also in `README.md`, "Install Fresing ToolBox"):
 
-1. Choose the icon: open `brand/drafts/ft-drafts-3.png` and `ft-drafts-2.png` (in this file above) and tell the
-   chat **A** or one of **A2–A12**.
-2. After that the chosen icon goes in and the release run is started again (GitHub → **Actions** → **release** →
-   **Run workflow**). Then: GitHub → smholte/ToolBox → **Releases** → the draft "Fresing ToolBox 0.1.0" → under
-   **Assets** download **Fresing-ToolBox-Setup-0.1.0.exe**. (The draft already holds an installer with the
-   placeholder icon A, if you want to try the app before choosing.)
+1. ~~Choose the icon~~ – done: A9.
+2. GitHub → smholte/ToolBox → **Releases** → the draft "Fresing ToolBox 0.1.0" → under **Assets** download
+   **Fresing-ToolBox-Setup-0.1.0.exe** (rebuilt with the A9 icon).
 3. Open it. **"Windows protected your PC"** appears: **More info** → **Run anyway**.
 4. The first screen explains that warning: **Next** → **Install** → leave **Run Fresing ToolBox** ticked → **Finish**.
 5. Next to the clock: a dark square with **Ft** (or under the **^** arrow). The drop window opens once by itself.
@@ -201,9 +215,8 @@ bar 30, radii 52/16, 22.8° cuts). The Fresing lead may want to check the drafts
 
 **Open points / follow-up tasks:**
 
-- **The owner's choice of t** (A or A2–A12). Then: set `CHOSEN` in `tools/make_icons.py`, run it (the `.ico`, tray icons and
-  PNGs follow), push, and send the chosen outline (`brand/ft-app-icon.svg`) to the Fresing lead through the ToolBox
-  lead.
+- **The ToolBox lead** sends the chosen outline (above, and `brand/ft-app-icon.svg`) to the Fresing lead, who may
+  want to check it against the brand specification §4.6–4.7 (this chat could not read `smholte/Fresing`).
 - **The owner's test on his PC** (steps above), from a draft release made after the choice.
 - The installer is 115 MB and electron-builder keeps a second copy of it for differential updates; task 0008
   (updates) decides whether that copy is wanted.

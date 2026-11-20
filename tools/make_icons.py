@@ -36,8 +36,8 @@ from PIL import Image, ImageDraw
 
 ROOT = Path(__file__).resolve().parent.parent
 
-# The owner's choice of t (task 0004). None = not chosen yet: draft A stands in as a placeholder.
-CHOSEN = None
+# The owner's choice of t (task 0004): A9, chosen 20 Nov 2026 after three rounds of drafts.
+CHOSEN = "A9"   # the owner, 20 Nov 2026
 PLACEHOLDER = "A"
 
 GREEN = (0x47, 0x9B, 0x29, 255)
