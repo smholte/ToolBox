@@ -70,6 +70,7 @@ Check ($p.ExitCode -eq 0) "the installer ends with 0 (got $($p.ExitCode))"
 Check (Test-Path $exe) "the app is in the user's own app folder ($installDir)"
 Check (Test-Path $uninstaller) 'the uninstaller is next to it'
 Check (Test-Path $startMenuLink) 'a Start-menu entry "Fresing ToolBox"'
+Check (-not (Test-Path (Join-Path ([Environment]::GetFolderPath('Desktop')) 'Fresing ToolBox.lnk'))) 'no Desktop shortcut'
 $run = RegValue $runKey $runName
 Check ($run -eq "`"$exe`" --autostart") "Start with Windows is on after install ($run)"
 Check (@(UninstallEntries 'HKCU').Count -eq 1) 'one entry in Settings > Apps, for this user'
@@ -123,6 +124,7 @@ Check ((RegValue $runKey $runName) -eq $null) 'the Start with Windows entry is g
 Check ((RegValue $approvedKey $runName) -eq $null) 'no Task Manager note about it is left'
 Check (@(UninstallEntries 'HKCU').Count -eq 0) 'the entry in Settings > Apps is gone'
 Check (-not (Test-Path $appData)) "the app's own data folder is gone"
+Check (-not (Test-Path (Join-Path $env:LOCALAPPDATA 'fresing-toolbox-updater'))) "the installer's own copy for updates is gone"
 Check ((MainProcesses).Count -eq 0) 'no process left'
 
 $after = Snapshot

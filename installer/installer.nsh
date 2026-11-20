@@ -17,13 +17,26 @@
   ${endIf}
 !macroend
 
-; Uninstall (not an update): remove the Run value and what Task Manager may have written about it. The install
-; folder, Start-menu entry, the uninstall entry and the app's own data folder are removed by electron-builder's
-; uninstaller (deleteAppDataOnUninstall in package.json).
+; Uninstall (not an update): remove the Run value and what Task Manager may have written about it, and the copy of
+; the installer electron-builder keeps for updates (%LOCALAPPDATA%\fresing-toolbox-updater). The install folder,
+; Start-menu entry, the uninstall entry and the app's own data folder are removed by electron-builder's uninstaller
+; (deleteAppDataOnUninstall in package.json).
+!ifdef BUILD_UNINSTALLER
+  Var toolboxRemoved
+
+  ; After everything else: %LOCALAPPDATA%\Programs too, but only when it is empty (we may have made it).
+  Function un.onUninstSuccess
+    StrCmp $toolboxRemoved "1" 0 +2
+      RMDir "$LOCALAPPDATA\Programs"
+  FunctionEnd
+!endif
+
 !macro customUnInstall
   ${ifNot} ${isUpdated}
     DeleteRegValue HKCU "Software\Microsoft\Windows\CurrentVersion\Run" "nl.fresing.toolbox"
     DeleteRegValue HKCU "Software\Microsoft\Windows\CurrentVersion\Explorer\StartupApproved\Run" "nl.fresing.toolbox"
+    RMDir /r "$LOCALAPPDATA\fresing-toolbox-updater"
+    StrCpy $toolboxRemoved "1"
   ${endIf}
 !macroend
 
