@@ -42,7 +42,7 @@ test('starts with the tray icon, its menu and the drop window', async () => {
     const page = await dropWindow(app);
     await waitFor(async () => (await page.textContent('#hint')) === en['drop.hint'], 'the hint text');
     assert.equal(await page.title(), en['drop.title']);
-    assert.equal(await app.evaluate(() => globalThis.toolbox.state.dropWindow.isVisible()), true);
+    await waitFor(() => app.evaluate(() => globalThis.toolbox.state.dropWindow.isVisible()), 'the drop window to show');
 
     const about = await app.evaluate(() => globalThis.toolbox.aboutTexts());
     const version = JSON.parse(fs.readFileSync(path.join(ROOT, 'package.json'), 'utf8')).version;
