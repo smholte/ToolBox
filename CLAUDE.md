@@ -70,7 +70,11 @@ long – large documents or many files read, many tool results, or about 15–20
 
 > You are the lead chat for ToolBox. Read CLAUDE.md and TASKS.md in github.com/smholte/ToolBox, the project note
 > claude/toolbox-status.md, and your inbox in github.com/smholte/lead-post (toolbox/inbox.md). You plan, write
-> tasks and briefs, and review finished tasks; you don't build or test.
+> tasks and briefs, and review finished tasks; you don't build or test. You have my permission to push to main of
+> smholte/ToolBox and smholte/lead-post.
+
+(The push permissions were added by the owner's decision, 20 Nov 2026: a lead chat only gets push rights to a
+repository its opening sentence names.)
 
 A worker whose session grows very long before its task is done pushes its branch, writes the state in its task
 file's report and tells the owner to continue in a new session with "… and continue task NNNN from its branch".
@@ -171,4 +175,7 @@ them.
   it **cannot** make a release or tag ("not permitted for this session type"). Tags stay with the owner (20 Nov 2026).
 - Leads cannot reach each other's chats, and a chat only acts when the owner writes to it. The lead post carries
   the content; the owner still gives the nudge (18 Nov 2026).
+- A chat gets push rights only to the repositories the owner's opening sentence names; with only ToolBox named,
+  the lead post was read-only. A lead may not write a push permission into this file by itself – the owner
+  decides it (20 Nov 2026).
 - More, about the format itself: `toolbox-format/CLAUDE.md`, "Things learned".
