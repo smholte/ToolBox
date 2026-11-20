@@ -47,8 +47,8 @@ Not a fault (no change): trailing spaces in names – 3.3 already refuses them.
      left alone"): it failed once on GitHub with `NotFoundError` from `DUMP` and passed on a re-run – it reads the
      page's folder while the page is still removing files. Make it wait for the page to finish, so it cannot fail
      by timing.
-   - `CHANGELOG.md`: the 0.1.1 heading still says "not tagged yet"; make it "tag `v0.1.1` (20 Nov 2026)", if the
-     owner has made the tag by then.
+   - `CHANGELOG.md`: the 0.1.1 heading still says "not tagged yet"; make it "tag `v0.1.1` (20 Nov 2026)" – the owner
+     made the tag that evening, on `cc0356c`.
 5. Push the branch, **do not merge**. The ToolBox lead reviews, then sends it to the House Planner and Fresing Render
    leads through the lead post.
 
