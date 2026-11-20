@@ -1,0 +1,2 @@
+# For tools/make_icons.py (the icons). The app itself needs no Python.
+pillow==12.3.0

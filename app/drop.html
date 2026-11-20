@@ -1,0 +1,23 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'self'; style-src 'self'; img-src 'self'">
+<title data-i18n="drop.title"></title>
+<link rel="stylesheet" href="drop.css">
+</head>
+<body>
+<main id="zone">
+  <img class="mark" src="icons/app_256px.png" alt="">
+  <p id="hint" data-i18n="drop.hint"></p>
+  <div id="file" hidden>
+    <p id="name"></p>
+    <p id="size"></p>
+    <p id="more"></p>
+  </div>
+  <p id="note" data-i18n="drop.note"></p>
+</main>
+<script src="format.js"></script>
+<script src="drop.js"></script>
+</body>
+</html>

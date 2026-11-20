@@ -1,0 +1,23 @@
+:root {
+  --ground: #1A2027;
+  --zone: #222A33;
+  --line: #3A4550;
+  --text: #FFFFFF;
+  --muted: #A9B4BE;
+  --green: #479B29;
+}
+* { box-sizing: border-box; }
+html, body { margin: 0; height: 100%; background: var(--ground); color: var(--text);
+  font: 14px/1.4 "Segoe UI", system-ui, sans-serif; user-select: none; }
+body { padding: 14px; }
+#zone { height: 100%; border: 2px dashed var(--line); border-radius: 12px; background: var(--zone);
+  display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 6px; padding: 12px;
+  text-align: center; transition: border-color .1s, background .1s; }
+#zone.over { border-color: var(--green); background: #26331f; }
+.mark { width: 40px; height: 40px; }
+p { margin: 0; }
+#hint { font-size: 16px; }
+#file { max-width: 100%; }
+#name { font-weight: 600; overflow-wrap: anywhere; }
+#size, #more, #note { color: var(--muted); }
+#note { font-size: 12px; margin-top: 6px; }

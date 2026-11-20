@@ -1,0 +1,40 @@
+# Builds the installer from main and puts it on a draft release; the owner reads it and publishes it (task 0004).
+# Start it by hand: GitHub > Actions > release > Run workflow.
+name: release
+on:
+  workflow_dispatch:
+permissions:
+  contents: write
+jobs:
+  draft:
+    runs-on: windows-2025
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: main
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+      - run: npm ci
+      - run: node --test tests/units.test.js tests/texts.test.js
+      - run: npm run dist
+      - name: Draft release
+        shell: pwsh
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          $version = (Get-Content package.json -Raw | ConvertFrom-Json).version
+          $tag = "v$version"
+          $setup = Get-ChildItem dist/Fresing-ToolBox-Setup-*.exe | Select-Object -First 1
+          $notes = "Fresing ToolBox $version – built from main ($env:GITHUB_SHA).`n`nThe installer is not signed yet: Windows shows " +
+                   "'Windows protected your PC'. Click More info, then Run anyway. See the README for the steps."
+          gh release view $tag 2>$null
+          if ($LASTEXITCODE -eq 0) {
+            $draft = gh release view $tag --json isDraft --jq .isDraft
+            if ($draft -ne 'true') { throw "$tag is already published: raise the version in package.json first." }
+            gh release upload $tag $setup.FullName --clobber
+          } else {
+            gh release create $tag $setup.FullName --draft --target main --title "Fresing ToolBox $version" --notes $notes
+          }

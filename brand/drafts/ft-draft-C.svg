@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- Fresing ToolBox app mark "Ft" · t draft C · F from the Fresing master outline (logo rev 01) · made by tools/make_icons.py -->
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" width="512" height="512">
+<title>Fresing ToolBox – draft C – tall stem to the top of the swoosh, crossbar to the right</title>
+<rect width="512" height="512" rx="112" fill="#1A2027"/>
+<g transform="translate(70.000 113.105) scale(1.180952)">
+<path fill="#479B29" d="M0.087 49 A52 52 0 0 1 52 0 L189.5 0 L172.7 40 L54.5 40 A16 16 0 0 0 40.113 49 Z"/>
+<path fill="#FFFFFF" d="M0 60 L38.5 60 L38.5 102 L166.5 102 L151.8 137 L38.5 137 L38.5 242 L0 242 Z"/>
+<path fill="#FFFFFF" d="M206 0 L206 190 A52 52 0 0 0 258 242 L284.4 242 L297 212 L257 212 A16 16 0 0 1 241 196 L241 101 L302.4 101 L315 71 L241 71 L241 0 Z"/>
+</g>
+</svg>
