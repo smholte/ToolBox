@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- Fresing ToolBox app mark "Ft" · t draft A8 · F from the Fresing master outline (logo rev 01) · made by tools/make_icons.py -->
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" width="512" height="512">
+<title>Fresing ToolBox – draft A8 – as A, more space between F and t</title>
+<rect width="512" height="512" rx="112" fill="#1A2027"/>
+<g transform="translate(70.000 116.644) scale(1.151703)">
+<path fill="#479B29" d="M0.087 49 A52 52 0 0 1 52 0 L189.5 0 L172.7 40 L54.5 40 A16 16 0 0 0 40.113 49 Z"/>
+<path fill="#FFFFFF" d="M0 60 L38.5 60 L38.5 102 L166.5 102 L151.8 137 L38.5 137 L38.5 242 L0 242 Z"/>
+<path fill="#FFFFFF" d="M228 40 L228 71 L202 71 L189.4 101 L228 101 L228 190 A52 52 0 0 0 280 242 L308.4 242 L321 212 L279 212 A16 16 0 0 1 263 196 L263 101 L310.4 101 L323 71 L263 71 L263 40 Z"/>
+</g>
+</svg>

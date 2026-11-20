@@ -17,6 +17,7 @@ Written (all under brand/ and app/icons/):
     brand/drafts/ft-draft-<name>.svg       each draft of the t, full size
     brand/drafts/ft-drafts.png             round 1 (A, B, C) at 256, 32, 24, 20 and 16 px, for the owner
     brand/drafts/ft-drafts-2.png           round 2 (A and five variations of it), the same way
+    brand/drafts/ft-drafts-3.png           round 3 (A and six smaller steps away from it)
     brand/ft-app-icon.svg                  the chosen mark (CHOSEN below; a placeholder until the owner chooses)
     brand/ft-app-icon_<n>px.png            16 … 1024 px
     brand/fresing-toolbox.ico              16, 20, 24, 32, 40, 48, 64, 256 px – the app, the installer, shortcuts
@@ -136,9 +137,23 @@ DRAFTS = {
                L=226, top=40, left=40, right=74, foot=58),
     "A6": dict(name="A6 – as A, short crossbar, long foot",
                L=214, top=40, left=26, right=44, foot=70),
+    # Round 3 (owner, 20 Nov 2026: "A still the best, more options"): small steps away from A itself.
+    "A7": dict(name="A7 – as A, the t closer to the F",
+               L=202, top=40, left=26, right=60, foot=58),
+    "A8": dict(name="A8 – as A, more space between F and t",
+               L=228, top=40, left=26, right=60, foot=58),
+    "A9": dict(name="A9 – as A, crossbar and foot end exactly above each other",
+               L=214, top=40, left=26, right=60, foot=60),
+    "A10": dict(name="A10 – as A, crossbar the same length on both sides",
+                L=222, top=40, left=40, right=40, foot=58),
+    "A11": dict(name="A11 – as A, stem a little lower (top 10 below the swoosh's lower edge)",
+                L=214, top=50, left=26, right=60, foot=58),
+    "A12": dict(name="A12 – as A, stem a little higher (top 10 above the swoosh's lower edge)",
+                L=214, top=30, left=26, right=60, foot=58),
 }
 ROUND_1 = ("A", "B", "C")
 ROUND_2 = ("A", "A2", "A3", "A4", "A5", "A6")
+ROUND_3 = ("A", "A7", "A8", "A9", "A10", "A11", "A12")
 
 
 def t_mark(L, top, left, right, foot):
@@ -373,6 +388,7 @@ def outputs():
         files["brand/drafts/ft-draft-%s.svg" % draft] = svg(draft, "Fresing ToolBox – draft " + DRAFTS[draft]["name"]).encode()
     files["brand/drafts/ft-drafts.png"] = png_bytes(drafts_sheet(ROUND_1))
     files["brand/drafts/ft-drafts-2.png"] = png_bytes(drafts_sheet(ROUND_2))
+    files["brand/drafts/ft-drafts-3.png"] = png_bytes(drafts_sheet(ROUND_3))
     title = "Fresing ToolBox" + ("" if CHOSEN else " (placeholder: draft %s until the owner chooses)" % chosen)
     files["brand/ft-app-icon.svg"] = svg(chosen, title).encode()
     for n in (16, 24, 32, 48, 64, 128, 256, 512, 1024):

@@ -17,7 +17,7 @@ waiting (for what) · running · done.
 | No. | Title | Status | Who · model · effort | Branch |
 | --- | --- | --- | --- | --- |
 | 0003 | Plan step B: [docs/step-b-router.md](docs/step-b-router.md), with the owner's six answers | done (18 Nov 2026) | lead | – |
-| 0004 | [The router's skeleton: tray app, drop window, installer, tests](tasks/0004-router-skeleton.md) | waiting for the owner: pick the icon (round 2: A or A2–A6, picture in the task file) and test on his PC – the rest is done and on `main` (20 Nov 2026) | worker · Opus · High | `task/0004-router-skeleton` |
+| 0004 | [The router's skeleton: tray app, drop window, installer, tests](tasks/0004-router-skeleton.md) | waiting for the owner: pick the icon (A or A2–A12, pictures in the task file) and test on his PC – the rest is done and on `main` (20 Nov 2026) | worker · Opus · High | `task/0004-router-skeleton` |
 | 0005–0009 | The folder · the popup and routes · jobs · Windows integration and updates · review and the owner's test list (listed in the plan) | waiting – each after the one before; its task file is written then | worker | – |
 
 ## Lane: Window (`smholte/ToolBox`)
@@ -27,7 +27,7 @@ Nothing yet; after the router.
 ## Waiting for the owner
 
 - Optional: run the trial once in Chrome too.
-- Task 0004: choose the icon draft A or A2–A6 ([picture](brand/drafts/ft-drafts-2.png)); then test Fresing ToolBox on his PC (steps in the task file).
+- Task 0004: choose the icon draft A or A2–A12 ([round 3](brand/drafts/ft-drafts-3.png), [round 2](brand/drafts/ft-drafts-2.png)); then test Fresing ToolBox on his PC (steps in the task file).
 
 ## Done
 
