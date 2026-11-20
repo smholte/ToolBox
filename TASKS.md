@@ -9,8 +9,8 @@ waiting (for what) · running · done.
 | --- | --- | --- | --- | --- |
 | 0001 | [Independent review of toolbox format v0.1](tasks/0001-independent-review-of-the-format.md) | done – 22 fixes as v0.1.1 ([pull request #1](https://github.com/smholte/toolbox-format/pull/1), merged by the lead 20 Nov 2026 as `cc0356c`, tagged `v0.1.1` by the owner the same evening); 29 rule findings → 0011 | worker · Opus · High | `task/0001-independent-review` |
 | 0002 | Trial on the owner's PC – **done by the owner, 18 Nov 2026, Edge 157 on Windows, real folder**: round trip works (small and 100 MB: written in 0.5 s, back in 13 s with an 8 s stand-in bake); after a restart Edge keeps the folder but asks one click ("Allow again"), and after "Allow on every visit" asks nothing. Left: the same once in Chrome; the stand-in's "slowed down" line also fires for its own bake (a wrong message in `trial/`, for task 0001) | done, two small points left | owner + lead | – |
-| 0010 | [Windows checks on the owner's PC (file names, long paths)](tasks/0010-windows-checks-on-the-owners-pc.md) | waiting for the owner – script done and green on GitHub's Windows machine (branch pushed); owner runs it, then the worker records the output and merges | worker · Sonnet · Medium, then owner | `task/0010-windows-checks` |
-| 0011 | [Format 0.2: the rule problems the review found (P1–P29) and the neighbours' findings (P30–P32)](tasks/0011-format-0.2.md) | waiting – after 0010 (v0.1.1 merged 20 Nov 2026) | worker · Opus · High | `task/0011-format-0.2` |
+| 0010 | [Windows checks on the owner's PC (file names, long paths)](tasks/0010-windows-checks-on-the-owners-pc.md) | done – owner's output 20 Nov 2026, merged | worker · Sonnet · Medium, then owner | `task/0010-windows-checks` |
+| 0011 | [Format 0.2: the rule problems the review found (P1–P29) and the neighbours' findings (P30–P32)](tasks/0011-format-0.2.md) | open – can start (0010 done) (v0.1.1 merged 20 Nov 2026) | worker · Opus · High | `task/0011-format-0.2` |
 
 ## Lane: Router (`smholte/ToolBox`)
 
@@ -27,12 +27,12 @@ Nothing yet; after the router.
 ## Waiting for the owner
 
 - Optional: run the trial once in Chrome too.
-- Run the Windows checks script of task 0010 on your PC (steps in `tasks/0010-…` report and in `README.md` of `toolbox-format` under "Windows checks"), and paste the output into the 0010 chat.
 
 ## Done
 
 | When | What | Where |
 | --- | --- | --- |
+| 20 Nov 2026 | Task 0010: Windows checks script, run by the owner; results in `toolbox-format/CLAUDE.md` | `smholte/toolbox-format` |
 | 18 Nov 2026 | Toolbox format 0.1 written, reviewed by the leads of House Planner and Fresing Render, tagged `v0.1` (before these rules, by the planning chat) | `smholte/toolbox-format`, FORMAT.md section 13 |
 | 18 Nov 2026 | Briefs to the leads of House Planner and Fresing Render for their side of step D | Fresing Render: its task 0217 |
 | 18 Nov 2026 | Working rules, task list and template set up | this repository |

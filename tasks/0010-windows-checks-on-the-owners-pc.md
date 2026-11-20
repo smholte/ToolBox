@@ -1,6 +1,6 @@
 # 0010 – Windows checks on the owner's PC (file names, long paths)
 
-**Who:** worker, then the owner · **Status:** waiting for the owner · **Lane:** Format
+**Who:** worker, then the owner · **Status:** done · **Lane:** Format
 **Repository it changes:** `smholte/toolbox-format` · **Branch:** `task/0010-windows-checks`
 **Started by:** lead, 19 Nov 2026 · **Model:** Sonnet · effort Medium · **Merge:** worker merges after a green GitHub run
 
@@ -44,9 +44,9 @@ a known timing fault (fixed in 0011), not caused by this task.
 
 ## Done when
 
-- [ ] The script runs on GitHub's Windows machine and cleans up after itself
-- [ ] The owner has run it; his output is in the report and in "Things learned"
-- [ ] Report below filled in
+- [x] The script runs on GitHub's Windows machine and cleans up after itself
+- [x] The owner has run it; his output is in the report and in "Things learned"
+- [x] Report below filled in
 
 ## Not in this task
 
@@ -77,5 +77,11 @@ owner's output decides, because the .NET calls the script uses may differ from w
 4. You should see about 40 lines starting `W1`, `W4`, `W5` and last `Clean up: done`. The text is on your clipboard:
    paste it into the chat of this task.
 
-**Open points / follow-up tasks:** owner's output → this report, `toolbox-format/CLAUDE.md` "Things learned", merge
-(a worker continues "task 0010 from its branch"). W2/W3 go to Fresing Render's own Windows tests (the lead tells that lead).
+**The owner's PC, 20 Nov 2026** (Windows 11 build 10.0.26200, Windows PowerShell 5.1; same result as GitHub's machine):
+- W1: all 14 names made a real file (listed and read back). Only .NET calls were tried; Python, Blender and Edge not.
+- W4: 311-character path written, read, deleted; also with `\\?\`. `LongPathsEnabled` = 1 on this PC. Not tested switched off.
+- W5: `ſ`/`s`, `µ`/`μ`, `ı`/`I`, `é` one character / `e`+accent: two files each (names are different on NTFS).
+- For 0011: refusing the device names stays a format rule, not a Windows fact; do not rely on long paths (a PC with them off is untested).
+
+**Open points / follow-up tasks:** (was: owner's output → this report, `toolbox-format/CLAUDE.md` "Things learned", merge
+- done. W2/W3 go to Fresing Render's own Windows tests (the lead tells that lead).
