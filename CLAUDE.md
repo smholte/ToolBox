@@ -191,7 +191,7 @@ python3 tools/make_icons.py --check       # icons up to date (pip install -r too
 - `tests/windows/install-test.ps1` – GitHub's Windows machine only: builds the installer, installs it without
   questions, checks the files, Start-menu entry and autostart entry, starts the app as at login, starts it twice,
   runs `app.test.js` against the installed app (and the registry), uninstalls, and checks nothing is left behind.
-- GitHub runs both at every push (`.github/workflows/test.yml`); the Windows job takes about 5 minutes.
+- GitHub runs both at every push (`.github/workflows/test.yml`); the Windows job takes about 3 minutes.
 - The app keeps test hooks that do nothing unless set: `FRESING_TOOLBOX_DATA` (settings folder),
   `FRESING_TOOLBOX_STATUS` (a file the app writes its state to), `FRESING_TOOLBOX_LANG_DIR` (language files).
 
