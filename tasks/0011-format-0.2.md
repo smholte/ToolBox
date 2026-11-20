@@ -1,6 +1,6 @@
 # 0011 – Format 0.2: the rule problems the review found
 
-**Who:** worker · **Status:** waiting – starts after 0010 (its Windows results decide P4–P6); v0.1.1 was merged on 20 Nov 2026 · **Lane:** Format
+**Who:** worker · **Status:** open – can start (0010 done 20 Nov 2026; its results are in the table below as "After 0010") · **Lane:** Format
 **Repository it changes:** `smholte/toolbox-format` · **Branch:** `task/0011-format-0.2`
 **Started by:** lead, 19 Nov 2026 · **Model:** Opus · effort High · **Merge:** lead review before merge, then both neighbour leads review (CLAUDE.md section 6)
 
@@ -35,6 +35,17 @@ Added by the lead on 20 Nov 2026, from the neighbours' leads (lead post):
 | P32 | Section 6.3: Web Locks only cover one origin. Copies of a tool on different origins (an offline file, an installed web app) rely on "only what I can place"; a copy writes its status at once when it takes a job. Say this in the text. (House Planner, task 0042.) |
 
 Not a fault (no change): trailing spaces in names – 3.3 already refuses them.
+
+**After 0010** (lead, 20 Nov 2026). 0010 ran on the owner's PC (Windows 11, PowerShell 5.1, .NET calls only): all 14
+W1 names made real files, a 311-character path worked (but "long paths" is switched on there), and every W5 pair gave
+two files. So .NET on a new Windows is more lenient than other programs may be; Python, Blender and browsers were not
+tried. These replace the "as far as 0010 shows" parts above:
+
+| # | Decision |
+| --- | --- |
+| P4 | Refusing device names is **a format rule, not a Windows fact.** Refuse a name when the part before its first dot, with trailing spaces removed, matched case-insensitively, is `CON`, `PRN`, `AUX`, `NUL`, `COM0`–`COM9`, `COM¹`–`COM³`, `LPT0`–`LPT9`, `LPT¹`–`LPT³`, `CONIN$`, `CONOUT$` or `CLOCK$`. That covers `con .txt`, `con.txt.txt` and `aux` alike. All 14 W1 names get a broken-copy test. |
+| P5 | Stands as written. NTFS keeps `ſ`/`s`, `µ`/`μ`, `ı`/`I` and the two `é` as two files, but the format treats each pair as the same name (NFC, then `upper()`): stricter than Windows, so safe. Say in the text that this is on purpose, and test the four pairs in both languages. |
+| P6 | Stands as written (limits 60 / 32 / 80, whole path under 260). Long paths worked on the owner's PC only because they are switched on; a PC with them off is untested. |
 
 ## The work
 
