@@ -29,4 +29,8 @@ function save(dir, settings) {
   fs.renameSync(tmp, file);
 }
 
-module.exports = { load, save, DEFAULTS, FILE };
+function exists(dir) {
+  return fs.existsSync(path.join(dir, FILE));
+}
+
+module.exports = { load, save, exists, DEFAULTS, FILE };

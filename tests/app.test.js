@@ -23,8 +23,10 @@ async function closeApp(app) {
 }
 
 test('starts with the tray icon, its menu and the drop window', async () => {
-  const app = await launch({ data: dataDir('start') });
+  const data = dataDir('start');
+  const app = await launch({ data });
   try {
+    if (data) assert.ok(fs.existsSync(path.join(data, 'settings.json')), 'the first start writes the settings file');
     const items = await menuItems(app);
     assert.deepEqual(items.filter((i) => i.type !== 'separator').map((i) => i.id),
       ['open', 'autostart', 'language', 'about', 'quit']);

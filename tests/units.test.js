@@ -68,3 +68,17 @@ test('installer texts: escaped for NSIS, taken from en.json', () => {
     assert.ok(nsh.includes('!define ' + name + ' "' + nsisString(en[key]) + '"'), name);
   }
 });
+
+test('one name for the app: AppUserModelId, Run value, installer, settings folder', () => {
+  const autostart = require('../app/autostart');
+  const pkg = JSON.parse(fs.readFileSync(path.join(__dirname, '..', 'package.json'), 'utf8'));
+  assert.equal(autostart.APP_ID, pkg.build.appId);
+  assert.equal(autostart.RUN_NAME, autostart.APP_ID, 'Electron finds the Run value by the AppUserModelId');
+  const nsh = fs.readFileSync(path.join(__dirname, '..', 'installer', 'installer.nsh'), 'utf8');
+  const runValues = [...nsh.matchAll(/CurrentVersion\\(?:Explorer\\StartupApproved\\)?Run" "([^"]+)"/g)].map((m) => m[1]);
+  assert.equal(runValues.length, 3);
+  for (const v of runValues) assert.equal(v, autostart.RUN_NAME);
+  assert.ok(nsh.includes('" ' + autostart.ARGS.join(' ') + "'"), 'the installer starts it with the same arguments');
+  // The installer looks for the app's settings file in the folder Electron uses: %APPDATA%\<productName>.
+  assert.ok(nsh.includes('$APPDATA\\' + pkg.productName + '\\' + settings.FILE));
+});

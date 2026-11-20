@@ -31,6 +31,25 @@ function UninstallEntries([string]$hive) {
     Where-Object { (Get-ItemProperty $_.PSPath -ErrorAction SilentlyContinue).DisplayName -like 'Fresing ToolBox*' }
 }
 
+function ReadStatus {
+  # The app replaces the file by a rename; a read can meet it half-way: try again until it parses.
+  for ($i = 0; $i -lt 20; $i++) {
+    try { if (Test-Path $status) { return (Get-Content $status -Raw | ConvertFrom-Json) } } catch { }
+    Start-Sleep -Milliseconds 100
+  }
+  return $null
+}
+
+function WaitStatus([scriptblock]$cond, [int]$seconds) {
+  $end = (Get-Date).AddSeconds($seconds)
+  do {
+    $st = ReadStatus
+    if ($st -and (& $cond $st)) { return $st }
+    Start-Sleep -Milliseconds 250
+  } while ((Get-Date) -lt $end)
+  return $st
+}
+
 function MainProcesses {
   # Electron runs helper processes under the same name; the app itself is the one without --type=
   @(Get-CimInstance Win32_Process -Filter "Name = 'Fresing ToolBox.exe'" |
@@ -55,7 +74,9 @@ function Snapshot {
       $props.PSObject.Properties | Where-Object { $_.Name -notlike 'PS*' } | ForEach-Object { $out += "value: $key\$($_.Name)" }
     }
   }
-  return $out
+  # %LOCALAPPDATA%\Programs is Windows' own per-user programs folder: the installer asks Windows for it, which makes
+  # it when missing (as on a fresh GitHub machine). It is not ours to remove.
+  return @($out | Where-Object { $_ -ne "file: $(Join-Path $env:LOCALAPPDATA 'Programs')" })
 }
 
 Write-Host "Installer: $($setup.Name) ($([math]::Round($setup.Length / 1MB, 1)) MB)"
@@ -76,14 +97,11 @@ Check ($run -eq "`"$exe`" --autostart") "Start with Windows is on after install 
 Check (@(UninstallEntries 'HKCU').Count -eq 1) 'one entry in Settings > Apps, for this user'
 Check (@(UninstallEntries 'HKLM').Count -eq 0) 'nothing for all users (no administrator rights used)'
 
+try {
 # 2. Start it as Windows does at login, and see the tray icon made.
 $env:FRESING_TOOLBOX_STATUS = $status
 $proc = Start-Process -FilePath $exe -ArgumentList '--autostart' -PassThru
-$state = $null
-for ($i = 0; $i -lt 60 -and -not ($state -and $state.tray); $i++) {
-  Start-Sleep -Milliseconds 500
-  if (Test-Path $status) { try { $state = Get-Content $status -Raw | ConvertFrom-Json } catch { $state = $null } }
-}
+$state = WaitStatus { param($st) $st.tray } 30
 Check ($state -and $state.tray) 'the installed app shows its tray icon'
 Check (-not $proc.HasExited) 'the tray process runs'
 Check ($state -and $state.autostartRegistered -eq $true) 'the app sees its own Start with Windows entry'
@@ -93,9 +111,8 @@ Check ($state -and $state.dropWindowVisible -eq $false) 'started at login: no wi
 $second = Start-Process -FilePath $exe -PassThru
 $ended = $second.WaitForExit(20000)
 Check $ended 'a second start ends by itself'
-Start-Sleep -Seconds 1
-$state = Get-Content $status -Raw | ConvertFrom-Json
-Check ($state.secondInstances -eq 1 -and $state.dropWindowVisible) 'the first instance shows its drop window instead'
+$state = WaitStatus { param($st) $st.secondInstances -eq 1 -and $st.dropWindowVisible } 15
+Check ($state -and $state.secondInstances -eq 1 -and $state.dropWindowVisible) 'the first instance shows its drop window instead'
 Check ((MainProcesses).Count -eq 1) "one instance only ($((MainProcesses).Count) running)"
 Stop-Process -Id $proc.Id -Force
 Start-Sleep -Seconds 2
@@ -110,13 +127,33 @@ Pop-Location
 Remove-Item env:TOOLBOX_EXE
 Check ($code -eq 0) 'the app tests pass against the installed app'
 Check ((MainProcesses).Count -eq 0) 'Quit leaves no process'
-Check ((RegValue $runKey $runName) -ne $null) 'Start with Windows is on again for the uninstall check'
+Check ((RegValue $runKey $runName) -ne $null) 'Start with Windows is on again after the app tests'
 
-# 4. Uninstall, without questions. The uninstaller copies itself away and returns at once: wait for it.
+# 3b. Installing again over it (an update by hand) keeps the user's choice: switch it off as the app does, install.
+$settingsFile = Join-Path $appData 'settings.json'
+Check (Test-Path $settingsFile) 'the app has written its settings file'
+$settings = Get-Content $settingsFile -Raw | ConvertFrom-Json
+$settings.startWithWindows = $false
+$settings | ConvertTo-Json | Set-Content $settingsFile -Encoding utf8
+Remove-ItemProperty -Path $runKey -Name $runName
+$p = Start-Process -FilePath $setup.FullName -ArgumentList '/S' -Wait -PassThru
+Check ($p.ExitCode -eq 0) "installing again ends with 0 (got $($p.ExitCode))"
+Check ((RegValue $runKey $runName) -eq $null) 'installing again does not switch Start with Windows back on'
+Check ((Get-Content $settingsFile -Raw | ConvertFrom-Json).startWithWindows -eq $false) 'installing again keeps the settings'
+# Back on, so the uninstall below must remove it.
+New-ItemProperty -Path $runKey -Name $runName -Value "`"$exe`" --autostart" -PropertyType String | Out-Null
+} finally {
+
+# 4. Uninstall, without questions (also when a step above stopped the script). The uninstaller copies itself away and
+# returns at once: wait for its last step, the removal of its entry in Settings > Apps.
+Get-Process -Name 'Fresing ToolBox' -ErrorAction SilentlyContinue | Stop-Process -Force
 $t0 = Get-Date
 Start-Process -FilePath $uninstaller -ArgumentList '/S' -Wait
-for ($i = 0; $i -lt 120 -and (Test-Path $installDir); $i++) { Start-Sleep -Milliseconds 500 }
-Start-Sleep -Seconds 2
+for ($i = 0; $i -lt 120 -and ((Test-Path $installDir) -or @(UninstallEntries 'HKCU').Count -gt 0); $i++) {
+  Start-Sleep -Milliseconds 500
+}
+Start-Sleep -Seconds 1
+}
 Write-Host "Uninstall took $([math]::Round(((Get-Date) - $t0).TotalSeconds, 1)) s"
 Check (-not (Test-Path $installDir)) 'the app folder is gone'
 Check (-not (Test-Path $startMenuLink)) 'the Start-menu entry is gone'
@@ -126,6 +163,7 @@ Check (@(UninstallEntries 'HKCU').Count -eq 0) 'the entry in Settings > Apps is 
 Check (-not (Test-Path $appData)) "the app's own data folder is gone"
 Check (-not (Test-Path (Join-Path $env:LOCALAPPDATA 'fresing-toolbox-updater'))) "the installer's own copy for updates is gone"
 Check ((MainProcesses).Count -eq 0) 'no process left'
+Check (-not (Test-Path "HKCU:\Software\Classes\AppUserModelId\$runName")) 'no AppUserModelId entry left'
 
 $after = Snapshot
 $left = @($after | Where-Object { $before -notcontains $_ })

@@ -9,7 +9,6 @@ const i18n = require('./i18n');
 const settingsStore = require('./settings');
 const autostart = require('./autostart');
 
-const APP_ID = 'nl.fresing.toolbox';
 const ICONS = path.join(__dirname, 'icons');
 
 // For the tests only: a separate settings folder, and a file the app keeps its state in.
@@ -29,6 +28,14 @@ const state = {
 
 function writeStatus() {
   if (!STATUS_FILE) return;
+  try {
+    writeStatusFile();
+  } catch {
+    // the status file is for the tests; the app goes on without it
+  }
+}
+
+function writeStatusFile() {
   const status = {
     pid: process.pid,
     version: app.getVersion(),
@@ -40,11 +47,16 @@ function writeStatus() {
     secondInstances: state.secondInstances,
     lastDrop: state.lastDrop,
   };
-  try {
-    fs.writeFileSync(STATUS_FILE + '.tmp', JSON.stringify(status, null, 2));
-    fs.renameSync(STATUS_FILE + '.tmp', STATUS_FILE);
-  } catch {
-    // the status file is for the tests; the app goes on without it
+  fs.writeFileSync(STATUS_FILE + '.tmp', JSON.stringify(status, null, 2));
+  // Windows refuses the rename while a reader has the file open: try a few times.
+  for (let i = 0; i < 20; i += 1) {
+    try {
+      fs.renameSync(STATUS_FILE + '.tmp', STATUS_FILE);
+      return;
+    } catch {
+      const until = Date.now() + 25;
+      while (Date.now() < until) { /* wait a moment */ }
+    }
   }
 }
 
@@ -197,10 +209,13 @@ function quit() {
 }
 
 function start() {
-  app.setAppUserModelId(APP_ID);
+  app.setAppUserModelId(autostart.APP_ID);
   state.settings = settingsStore.load(app.getPath('userData'));
+  // The settings file marks that the app has run: from now on it alone owns "Start with Windows" (the installer
+  // only sets it when there is no such file).
+  if (!settingsStore.exists(app.getPath('userData'))) settingsStore.save(app.getPath('userData'), state.settings);
   state.t = i18n.load(state.settings.language);
-  autostart.apply(app, state.settings.startWithWindows);
+  autostart.sync(app, state.settings.startWithWindows);
 
   ipcMain.handle('toolbox:texts', () => ({ texts: state.t.all(), locale: state.t.locale }));
   ipcMain.on('toolbox:dropped', (event, files) => {
