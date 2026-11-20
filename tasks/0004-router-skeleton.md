@@ -1,6 +1,6 @@
 # 0004 – The router's skeleton: tray app, drop window, installer, tests
 
-**Who:** worker · **Status:** open – can start (its condition is met: Fresing Render's task 0217 was released in 0.2.173, 19 Nov 2026); the owner starts it · **Lane:** Router
+**Who:** worker · **Status:** running (worker, started 20 Nov 2026) · **Lane:** Router
 **Repository it changes:** `smholte/ToolBox` · **Branch:** `task/0004-router-skeleton`
 **Started by:** lead, 18 Nov 2026 · **Model:** Opus · effort High · **Environment:** add `smholte/Fresing` (read only) · **Merge:** worker merges after a green GitHub run
 

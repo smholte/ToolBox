@@ -17,7 +17,7 @@ waiting (for what) · running · done.
 | No. | Title | Status | Who · model · effort | Branch |
 | --- | --- | --- | --- | --- |
 | 0003 | Plan step B: [docs/step-b-router.md](docs/step-b-router.md), with the owner's six answers | done (18 Nov 2026) | lead | – |
-| 0004 | [The router's skeleton: tray app, drop window, installer, tests](tasks/0004-router-skeleton.md) | open – can start (Fresing Render's 0217 released 19 Nov 2026) | worker · Opus · High | `task/0004-router-skeleton` |
+| 0004 | [The router's skeleton: tray app, drop window, installer, tests](tasks/0004-router-skeleton.md) | running (worker, started 20 Nov 2026) | worker · Opus · High | `task/0004-router-skeleton` |
 | 0005–0009 | The folder · the popup and routes · jobs · Windows integration and updates · review and the owner's test list (listed in the plan) | waiting – each after the one before; its task file is written then | worker | – |
 
 ## Lane: Window (`smholte/ToolBox`)
@@ -29,7 +29,6 @@ Nothing yet; after the router.
 - Optional: run the trial once in Chrome too.
 - Tag `v0.1.1` of `smholte/toolbox-format` on commit `cc0356c` (merged by the lead; a chat may not make releases).
 - Start task 0010.
-- Start task 0004 (it can run at the same time as 0010: another lane).
 
 ## Done
 
