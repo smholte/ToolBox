@@ -166,9 +166,15 @@ Check ((MainProcesses).Count -eq 0) 'no process left'
 Check (-not (Test-Path "HKCU:\Software\Classes\AppUserModelId\$runName")) 'no AppUserModelId entry left'
 
 $after = Snapshot
-$left = @($after | Where-Object { $before -notcontains $_ })
-foreach ($l in $left) { Write-Host "      left behind: $l" }
-Check ($left.Count -eq 0) "nothing new is left behind ($($left.Count) items)"
+$new = @($after | Where-Object { $before -notcontains $_ })
+# Other programs on GitHub's machine also write while the test runs (Firefox made its Mozilla folders once). What
+# could be ours: a name with Fresing, ToolBox or Electron in it, or a GUID-named key (electron-builder's install key).
+$ours = '(?i)fresing|toolbox|electron|[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}'
+$left = @($new | Where-Object { $_ -match $ours })
+foreach ($l in $new) {
+  if ($l -match $ours) { Write-Host "      left behind: $l" } else { Write-Host "      new, not ours (ignored): $l" }
+}
+Check ($left.Count -eq 0) "nothing of ours is left behind ($($left.Count) items)"
 
 Write-Host "The install test took $([math]::Round(((Get-Date) - $started).TotalSeconds)) s; $script:failed failed."
 exit $script:failed
