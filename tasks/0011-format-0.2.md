@@ -118,7 +118,7 @@ Router, apps, the trial page beyond what a rule change needs, making a tag.
 - Take-up with 8 copies at once: exactly one winner in 1500 of 1500 rounds. The worst order of steps is forced in a
   test.
 - The only patterns left (the built-in IFC/STEP one) take well under a second on hostile 64 KiB files.
-- The formerly flaky trial test: being run 15 times in a row in the container (result added when done).
+- The formerly flaky trial test: passed 15 of 15 runs in a row in the container.
 - **Not tested on Windows:** the lock file and the rewritten status while another program reads it. The Windows job
   on GitHub runs only the PowerShell script, not the tests. This is an expectation: `O_EXCL` and replace work on NTFS,
   and a failed replace is "try again".
