@@ -101,6 +101,21 @@ repository a task changes.
 `smholte/toolbox-format` keeps a `CLAUDE.md` of its own with the rules that belong to it (its tests, its "things
 learned"). A worker in that repository reads both.
 
+**Layout of this repository** (task 0004):
+
+| Folder | Holds |
+| --- | --- |
+| `app/` | the router (Electron, plain JavaScript, no build step): `main.js` (tray, menu, drop window, one instance), `autostart.js` (Windows only), `i18n.js`, `settings.js`, `format.js`, the drop window (`drop.html`, `drop.js`, `drop.css`, `preload.js`), `icons/` (made by `tools/make_icons.py`) |
+| `app/lang/` | every text the user sees: one file per language, `en.json` complete; the installer's texts too |
+| `installer/` | additions to electron-builder's Windows installer (`installer.nsh`, Windows only); `texts.nsh` is written at build time |
+| `tests/` | the tests (section 8); `tests/windows/` runs only on GitHub's Windows machine |
+| `tools/` | `make_icons.py` (the icons, Python + Pillow), `installer-texts.js` |
+| `brand/` | the app mark "Ft": the SVG, PNGs, the `.ico`, and the drafts the owner chose from (`brand/drafts/`) |
+| `docs/`, `tasks/` | plans, task files |
+| `.github/workflows/` | `test.yml` (every push), `release.yml` (by hand: installer from `main` as a draft release) |
+
+`package.json` holds the version (the app's, `0.1.0` and up) and the installer settings (`build`).
+
 ## 4. Tasks
 
 - A task is a file `tasks/NNNN-short-name.md` in this repository, made from `tasks/TEMPLATE.md`. Its header names
@@ -164,7 +179,27 @@ them.
 - Licences: a repository says its licence before others copy from it. Nothing comes in under a licence that stops
   the owner's other apps from using it. (`toolbox-format` and this repository: MIT.)
 
-## 8. Things learned the hard way
+## 8. Tests (the router)
+
+```bash
+npm ci                                    # once; Electron, electron-builder, Playwright (no browsers needed)
+xvfb-run -a npm test                      # Linux: units, texts, and the app itself under a virtual screen
+python3 tools/make_icons.py --check       # icons up to date (pip install -r tools/requirements.txt)
+```
+
+- `tests/units.test.js` – sizes, placeholders, languages, settings, installer texts.
+- `tests/texts.test.js` – **no text written straight into the code or pages**, every key of `en.json` used and every
+  key used present, other language files only with English keys. A new text goes into `en.json` first.
+- `tests/app.test.js` – the app started through Playwright: tray menu, drop window (a dropped file's name and size),
+  one instance, Start with Windows off and still off after a restart, the language setting, Quit.
+- `tests/windows/install-test.ps1` – GitHub's Windows machine only: builds the installer, installs it without
+  questions, checks the files, Start-menu entry and autostart entry, starts the app as at login, starts it twice,
+  runs `app.test.js` against the installed app (and the registry), uninstalls, and checks nothing is left behind.
+- GitHub runs both at every push (`.github/workflows/test.yml`); the Windows job takes about 3 minutes.
+- The app keeps test hooks that do nothing unless set: `FRESING_TOOLBOX_DATA` (settings folder),
+  `FRESING_TOOLBOX_STATUS` (a file the app writes its state to), `FRESING_TOOLBOX_LANG_DIR` (language files).
+
+## 9. Things learned the hard way
 
 - A chat can push branches but not tags; the owner makes tags (18 Nov 2026).
 - A page on GitHub Pages only exists after the owner has turned Pages on in the repository's settings; a chat cannot

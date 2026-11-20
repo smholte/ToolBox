@@ -1,0 +1,64 @@
+{
+  "name": "fresing-toolbox",
+  "productName": "Fresing ToolBox",
+  "version": "0.1.0",
+  "description": "Fresing ToolBox – hands files from one tool to the next",
+  "main": "app/main.js",
+  "author": "Fresing",
+  "license": "MIT",
+  "private": true,
+  "scripts": {
+    "start": "electron .",
+    "test": "node --test --test-concurrency=1 tests/*.test.js",
+    "dist": "node tools/installer-texts.js && electron-builder --win nsis --x64 --publish never"
+  },
+  "devDependencies": {
+    "electron": "45.2.3",
+    "electron-builder": "26.18.1",
+    "playwright": "1.65.0"
+  },
+  "build": {
+    "appId": "nl.fresing.toolbox",
+    "productName": "Fresing ToolBox",
+    "copyright": "© 2026 Fresing",
+    "directories": {
+      "output": "dist",
+      "buildResources": "installer"
+    },
+    "files": [
+      "app/**/*",
+      "package.json",
+      "LICENSE"
+    ],
+    "win": {
+      "target": [
+        {
+          "target": "nsis",
+          "arch": [
+            "x64"
+          ]
+        }
+      ],
+      "icon": "brand/fresing-toolbox.ico",
+      "executableName": "Fresing ToolBox"
+    },
+    "nsis": {
+      "oneClick": false,
+      "perMachine": false,
+      "allowElevation": false,
+      "packElevateHelper": false,
+      "allowToChangeInstallationDirectory": false,
+      "createDesktopShortcut": false,
+      "createStartMenuShortcut": true,
+      "shortcutName": "Fresing ToolBox",
+      "menuCategory": false,
+      "runAfterFinish": true,
+      "deleteAppDataOnUninstall": true,
+      "installerIcon": "brand/fresing-toolbox.ico",
+      "uninstallerIcon": "brand/fresing-toolbox.ico",
+      "uninstallDisplayName": "Fresing ToolBox",
+      "include": "installer/installer.nsh",
+      "artifactName": "Fresing-ToolBox-Setup-${version}.exe"
+    }
+  }
+}
