@@ -143,6 +143,10 @@ bar 30, radii 52/16, 22.8° cuts). The Fresing lead may want to check the drafts
   `%LOCALAPPDATA%`, `%APPDATA%`, Start menu, Desktop, Startup, keys under `HKCU\Software`, `…\Uninstall`,
   `…\Classes`, notification settings, Run and StartupApproved values. All 36 checks pass. The whole Windows job takes
   **about 3 minutes** (npm install, building the installer ~1 min, the install test itself ~70 s).
+- **Release run** on GitHub, from `main`: made the draft release **v0.1.0** with `Fresing-ToolBox-Setup-0.1.0.exe`
+  (placeholder icon A). Running it again after the icon choice replaces the file in the same draft.
+- After the merge one app test failed once on `main` (it checked the drop window before it had finished showing, on
+  a slow first start); it now waits. `main` green again at `347b452`.
 - **Not tested by a chat:** the welcome screen's look and the SmartScreen warning (a silent install shows no
   screens), whether the icon is visible next to the clock on a real desktop, dragging a real file from Explorer
   (the tests drop a file inside the page). These are the owner's steps.
@@ -155,8 +159,10 @@ bar 30, radii 52/16, 22.8° cuts). The Fresing lead may want to check the drafts
 **Steps for the owner** (also in `README.md`, "Install Fresing ToolBox"):
 
 1. Choose the icon: open `brand/drafts/ft-drafts.png` (in this file above) and tell the chat **A**, **B** or **C**.
-2. After that the lead or a chat runs the release run; then: GitHub → smholte/ToolBox → **Releases** → the draft
-   "Fresing ToolBox 0.1.0" → under **Assets** download **Fresing-ToolBox-Setup-0.1.0.exe**.
+2. After that the chosen icon goes in and the release run is started again (GitHub → **Actions** → **release** →
+   **Run workflow**). Then: GitHub → smholte/ToolBox → **Releases** → the draft "Fresing ToolBox 0.1.0" → under
+   **Assets** download **Fresing-ToolBox-Setup-0.1.0.exe**. (The draft already holds an installer with the
+   placeholder icon A, if you want to try the app before choosing.)
 3. Open it. **"Windows protected your PC"** appears: **More info** → **Run anyway**.
 4. The first screen explains that warning: **Next** → **Install** → leave **Run Fresing ToolBox** ticked → **Finish**.
 5. Next to the clock: a dark square with **Ft** (or under the **^** arrow). The drop window opens once by itself.
