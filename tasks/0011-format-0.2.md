@@ -1,6 +1,6 @@
 # 0011 – Format 0.2: the rule problems the review found
 
-**Who:** worker · **Status:** open – can start (0010 done 20 Nov 2026; its results are in the table below as "After 0010") · **Lane:** Format
+**Who:** worker · **Status:** running (worker, started 20 Nov 2026) · **Lane:** Format
 **Repository it changes:** `smholte/toolbox-format` · **Branch:** `task/0011-format-0.2`
 **Started by:** lead, 19 Nov 2026 · **Model:** Opus · effort High · **Merge:** lead review before merge, then both neighbour leads review (CLAUDE.md section 6)
 
