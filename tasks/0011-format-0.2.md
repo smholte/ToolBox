@@ -1,6 +1,6 @@
 # 0011 – Format 0.2: the rule problems the review found
 
-**Who:** worker · **Status:** waiting – starts after 0010 (its Windows results decide P4–P6) and after v0.1.1 is merged · **Lane:** Format
+**Who:** worker · **Status:** waiting – starts after 0010 (its Windows results decide P4–P6); v0.1.1 was merged on 20 Nov 2026 · **Lane:** Format
 **Repository it changes:** `smholte/toolbox-format` · **Branch:** `task/0011-format-0.2`
 **Started by:** lead, 19 Nov 2026 · **Model:** Opus · effort High · **Merge:** lead review before merge, then both neighbour leads review (CLAUDE.md section 6)
 
@@ -42,7 +42,14 @@ Not a fault (no change): trailing spaces in names – 3.3 already refuses them.
    languages, with a broken-copy test per new rule and a JavaScript/Python comparison where both judge it.
 2. `VERSION` 0.2; samples remade; `CHANGELOG.md` says, per change, what an app has to do.
 3. A short "What changed for tool authors" at the top of the changelog entry, for the leads' review.
-4. Push the branch, **do not merge**. The ToolBox lead reviews, then sends it to the House Planner and Fresing Render
+4. Two small fixes found while merging v0.1.1 (20 Nov 2026):
+   - `tests/test_web.py`, the trial test around line 433 ("a bake that answers a job this browser did not send is
+     left alone"): it failed once on GitHub with `NotFoundError` from `DUMP` and passed on a re-run – it reads the
+     page's folder while the page is still removing files. Make it wait for the page to finish, so it cannot fail
+     by timing.
+   - `CHANGELOG.md`: the 0.1.1 heading still says "not tagged yet"; make it "tag `v0.1.1` (20 Nov 2026)", if the
+     owner has made the tag by then.
+5. Push the branch, **do not merge**. The ToolBox lead reviews, then sends it to the House Planner and Fresing Render
    leads through the lead post.
 
 ## Done when

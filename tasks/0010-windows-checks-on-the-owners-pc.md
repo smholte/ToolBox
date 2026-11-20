@@ -39,6 +39,9 @@ The owner is not a programmer. He may not have Python. **Use PowerShell** (built
 4. **Stop for the owner** ("WAITING FOR YOU:") with his steps. When he has pasted the output, write it into the
    report and into `CLAUDE.md` "Things learned" (one line per finding), then merge.
 
+If the existing web test in `tests/test_web.py` around line 433 fails once with `NotFoundError`, re-run it: it is
+a known timing fault (fixed in 0011), not caused by this task.
+
 ## Done when
 
 - [ ] The script runs on GitHub's Windows machine and cleans up after itself

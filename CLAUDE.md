@@ -167,6 +167,8 @@ them.
   do that and should check that the address answers before sending the owner there (18 Nov 2026).
 - A chat may be refused a push to `main` of another repository by Claude's own safety check; open a pull request
   instead (GitHub REST API) and let the owner merge it (19 Nov 2026).
+- A chat **can merge** a pull request through GitHub's REST API (`PUT …/pulls/N/merge`) and re-run a failed run;
+  it **cannot** make a release or tag ("not permitted for this session type"). Tags stay with the owner (20 Nov 2026).
 - Leads cannot reach each other's chats, and a chat only acts when the owner writes to it. The lead post carries
   the content; the owner still gives the nudge (18 Nov 2026).
 - More, about the format itself: `toolbox-format/CLAUDE.md`, "Things learned".
