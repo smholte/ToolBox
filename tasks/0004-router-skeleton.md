@@ -74,7 +74,7 @@ updates (0008); signing; macOS and Linux installers; the window with web tools (
 
 **Chat / date:** worker chat (Claude Code on the web), 20 Nov 2026. Branch `task/0004-router-skeleton`.
 
-**State: WAITING FOR THE OWNER** – the icon choice (A, B or C) and his test on his PC. Everything else is done and
+**State: WAITING FOR THE OWNER** – the icon choice (round 2: A, A2, A3, A4, A5 or A6) and his test on his PC. Everything else is done and
 green on GitHub. The app carries draft **A** as a placeholder until he chooses.
 
 **What changed:**
@@ -121,6 +121,18 @@ stroke ends cut at 22.8°).
   Render's "Fr".
 - **C** – the stem rises to the top of the swoosh (as tall as the F), crossbar to the right. Most distinct at 16 px.
 
+**Round 2** (owner, 20 Nov 2026: "Draft A is favourite so far, give more drafts"): A and five variations of it,
+all with the crossbar on both sides of the stem (`brand/drafts/ft-drafts-2.png`, SVGs beside it):
+
+![Round 2: A and five variations](../brand/drafts/ft-drafts-2.png)
+
+- **A** – as before.
+- **A2** – shorter crossbar and foot: lighter, more open.
+- **A3** – taller stem: rises halfway up beside the swoosh.
+- **A4** – stem up to the top of the swoosh, as tall as the F.
+- **A5** – wider crossbar on both sides.
+- **A6** – short crossbar, long foot.
+
 **Note on the source of the F:** `smholte/Fresing` could not be added to this session (refused by the session's
 safety check), so the brand specification §4.6–4.7 was not read. The F's outline was taken from the public Fresing
 Render app mark (`site/brand/fresing-render/fresing-render-app-icon.svg` in `smholte/CAD-render-animation`, "from
@@ -158,7 +170,8 @@ bar 30, radii 52/16, 22.8° cuts). The Fresing lead may want to check the drafts
 
 **Steps for the owner** (also in `README.md`, "Install Fresing ToolBox"):
 
-1. Choose the icon: open `brand/drafts/ft-drafts.png` (in this file above) and tell the chat **A**, **B** or **C**.
+1. Choose the icon: open `brand/drafts/ft-drafts-2.png` (in this file above) and tell the chat **A**, **A2**, **A3**,
+   **A4**, **A5** or **A6**.
 2. After that the chosen icon goes in and the release run is started again (GitHub → **Actions** → **release** →
    **Run workflow**). Then: GitHub → smholte/ToolBox → **Releases** → the draft "Fresing ToolBox 0.1.0" → under
    **Assets** download **Fresing-ToolBox-Setup-0.1.0.exe**. (The draft already holds an installer with the
@@ -175,7 +188,7 @@ bar 30, radii 52/16, 22.8° cuts). The Fresing lead may want to check the drafts
 
 **Open points / follow-up tasks:**
 
-- **The owner's choice of t** (A/B/C). Then: set `CHOSEN` in `tools/make_icons.py`, run it (the `.ico`, tray icons and
+- **The owner's choice of t** (round 2: A, A2–A6). Then: set `CHOSEN` in `tools/make_icons.py`, run it (the `.ico`, tray icons and
   PNGs follow), push, and send the chosen outline (`brand/ft-app-icon.svg`) to the Fresing lead through the ToolBox
   lead.
 - **The owner's test on his PC** (steps above), from a draft release made after the choice.

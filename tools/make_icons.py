@@ -14,8 +14,9 @@ from vertical (12.6 across a stroke of 30, as the r of the master), white letter
 the rounded Deep Charcoal #1A2027 square of the Fresing app icon (same square, corner radius and padding).
 
 Written (all under brand/ and app/icons/):
-    brand/drafts/ft-draft-<A|B|C>.svg      the three drafts of the t, full size
-    brand/drafts/ft-drafts.png             the three side by side at 256, 32, 24, 20 and 16 px, for the owner
+    brand/drafts/ft-draft-<name>.svg       each draft of the t, full size
+    brand/drafts/ft-drafts.png             round 1 (A, B, C) at 256, 32, 24, 20 and 16 px, for the owner
+    brand/drafts/ft-drafts-2.png           round 2 (A and five variations of it), the same way
     brand/ft-app-icon.svg                  the chosen mark (CHOSEN below; a placeholder until the owner chooses)
     brand/ft-app-icon_<n>px.png            16 … 1024 px
     brand/fresing-toolbox.ico              16, 20, 24, 32, 40, 48, 64, 256 px – the app, the installer, shortcuts
@@ -124,7 +125,20 @@ DRAFTS = {
               L=196, top=40, left=0, right=84, foot=66),
     "C": dict(name="C – tall stem to the top of the swoosh, crossbar to the right",
               L=206, top=0, left=0, right=74, foot=56),
+    # Round 2 (owner, 20 Nov 2026: "A is favourite so far, more drafts"): A's crossbar on both sides, varied.
+    "A2": dict(name="A2 – as A, shorter crossbar and foot (lighter)",
+               L=208, top=40, left=16, right=46, foot=46),
+    "A3": dict(name="A3 – as A, taller stem (top 20 above the swoosh's lower edge)",
+               L=214, top=20, left=26, right=60, foot=58),
+    "A4": dict(name="A4 – as A, stem up to the top of the swoosh",
+               L=214, top=0, left=26, right=60, foot=58),
+    "A5": dict(name="A5 – as A, wider crossbar on both sides",
+               L=226, top=40, left=40, right=74, foot=58),
+    "A6": dict(name="A6 – as A, short crossbar, long foot",
+               L=214, top=40, left=26, right=44, foot=70),
 }
+ROUND_1 = ("A", "B", "C")
+ROUND_2 = ("A", "A2", "A3", "A4", "A5", "A6")
 
 
 def t_mark(L, top, left, right, foot):
@@ -198,10 +212,46 @@ _Y = {16: {0: 3, 40: 5, 49: 5, 60: 6, 71: 6, 101: 8, 102: 8, 137: 10, 212: 11, 2
 HAND_SET = (16, 20, 24)
 
 
+_STEM_PX = {16: (10, 12), 20: (12, 14), 24: (14, 17)}   # the t's stem at the small sizes, as in A
+_MAX_LEFT_PX = {16: 1, 20: 2, 24: 3}                    # so the crossbar never reaches the F's arm
+
+
+def _t_rule(draft, size):
+    """Small-size edges of a t with a crossbar on both sides (round 2), by the same rules as A's table: the stem
+    where A has it, each bar end its own length rounded (at least 1 px left, 2 px right), every cut 1 px."""
+    d = DRAFTS[draft]
+    s, _, _ = placement(mark(draft))
+    kpx = s * size / SQUARE
+    L, R = d["L"], d["L"] + STEM
+    lp, rp = _STEM_PX[size]
+    out = {L: lp, R: rp}
+    if d["left"]:
+        top = lp - min(_MAX_LEFT_PX[size], max(1, round(d["left"] * kpx)))
+        out.update({L - d["left"]: top, L - d["left"] - CUT: top - 1})
+    bar = rp + max(2, round(d["right"] * kpx))
+    foot = rp + max(2, round(d["foot"] * kpx))
+    if abs(d["right"] - d["foot"]) < CUT:     # ends this close in the outline end in the same pixel column
+        foot = bar
+    elif d["right"] > d["foot"]:              # otherwise the longer one stays at least a pixel longer
+        bar = max(bar, foot + 1)
+    else:
+        foot = max(foot, bar + 1)
+    out.update({R + d["right"]: bar, R + d["right"] - CUT: bar - 1, R + d["foot"]: foot, R + d["foot"] - CUT: foot - 1})
+    return out
+
+
 def hand_stops(draft, size):
-    xs = dict(_F_X_A[size] if draft == "A" else _F_X[size])
-    xs.update(_T_X[draft][size])
-    return xs, dict(_Y[size])
+    """Small-size edges: one map for the F, one for the t (so the t's crossbar can pass under the swoosh's end), one
+    for the heights."""
+    fx = dict(_F_X[size] if draft in ("B", "C") else _F_X_A[size])
+    if draft in _T_X:
+        tx = dict(_T_X[draft][size])
+        if 189.5 in tx:                      # C moves the swoosh's end, not the t
+            fx[189.5] = tx.pop(189.5)
+            fx[172.7] = min(fx[172.7], fx[189.5])
+    else:
+        tx = _t_rule(draft, size)
+    return fx, tx, dict(_Y[size])
 
 
 def snap_map(stops, scale, offset):
@@ -235,15 +285,15 @@ def render(draft, size, whole_pixels=False):
     s, ox, oy = placement(shapes)
     k = size / SQUARE
     if whole_pixels and size in HAND_SET:
-        xs, ys = hand_stops(draft, size)
-        mx = snap_map(xs, s * k, ox * k)
+        fx, tx, ys = hand_stops(draft, size)
+        maps = [snap_map(fx, s * k, ox * k)] * 2 + [snap_map(tx, s * k, ox * k)]
         my = snap_map(ys, s * k, oy * k)
     elif whole_pixels:
         xs, ys = edges(shapes)
-        mx = snap_map({v: round(v * s * k + ox * k) for v in xs}, s * k, ox * k)
+        maps = [snap_map({v: round(v * s * k + ox * k) for v in xs}, s * k, ox * k)] * 3
         my = snap_map({v: round(v * s * k + oy * k) for v in ys}, s * k, oy * k)
     else:
-        mx = lambda v: v * s * k + ox * k
+        maps = [lambda v: v * s * k + ox * k] * 3
         my = lambda v: v * s * k + oy * k
     ss = 16 if size <= 64 else 4          # supersampling
     img = Image.new("RGBA", (size * ss, size * ss), (0, 0, 0, 0))
@@ -252,7 +302,7 @@ def render(draft, size, whole_pixels=False):
     if whole_pixels:
         r = round(CORNER * k) * ss
     d.rounded_rectangle((0, 0, size * ss - 1, size * ss - 1), radius=r, fill=CHARCOAL)
-    for col, c in shapes:
+    for (col, c), mx in zip(shapes, maps):
         d.polygon([(mx(x) * ss, my(y) * ss) for x, y in c.points()], fill=col)
     return img.resize((size, size), Image.Resampling.BOX)
 
@@ -288,18 +338,20 @@ def ico_bytes(images):
     return out + b"".join(blobs)
 
 
-def drafts_sheet():
-    """The three drafts side by side, large and at the small sizes, for the owner to choose from."""
+def drafts_sheet(drafts):
+    """The drafts, three to a row, large and at the small sizes, for the owner to choose from."""
     pad = 24
     col_w = 256 + 2 * pad
     smalls = (32, 24, 20, 16)
     h = pad + 256 + pad + 32 * 3 + pad + 40
-    sheet = Image.new("RGBA", (col_w * 3, h), (240, 240, 240, 255))
-    for i, draft in enumerate("ABC"):
-        x0 = i * col_w + pad
-        sheet.alpha_composite(render(draft, 256), (x0, pad))
+    rows = (len(drafts) + 2) // 3
+    sheet = Image.new("RGBA", (col_w * 3, h * rows), (240, 240, 240, 255))
+    for i, draft in enumerate(drafts):
+        x0 = (i % 3) * col_w + pad
+        y0 = (i // 3) * h
+        sheet.alpha_composite(render(draft, 256), (x0, y0 + pad))
         x = x0
-        y = pad + 256 + pad
+        y = y0 + pad + 256 + pad
         for n in smalls:                       # actual size …
             sheet.alpha_composite(render(draft, n, whole_pixels=True), (x, y + 32 - n))
             x += n + 10
@@ -310,16 +362,17 @@ def drafts_sheet():
             sheet.alpha_composite(big, (x, y))
             x += n * 3 + 8
         d = ImageDraw.Draw(sheet)
-        d.text((x0, h - 30), "Draft " + draft, fill=(26, 32, 39, 255))
+        d.text((x0, y0 + h - 30), "Draft " + draft, fill=(26, 32, 39, 255))
     return sheet
 
 
 def outputs():
     chosen = CHOSEN or PLACEHOLDER
     files = {}
-    for draft in "ABC":
+    for draft in DRAFTS:
         files["brand/drafts/ft-draft-%s.svg" % draft] = svg(draft, "Fresing ToolBox – draft " + DRAFTS[draft]["name"]).encode()
-    files["brand/drafts/ft-drafts.png"] = png_bytes(drafts_sheet())
+    files["brand/drafts/ft-drafts.png"] = png_bytes(drafts_sheet(ROUND_1))
+    files["brand/drafts/ft-drafts-2.png"] = png_bytes(drafts_sheet(ROUND_2))
     title = "Fresing ToolBox" + ("" if CHOSEN else " (placeholder: draft %s until the owner chooses)" % chosen)
     files["brand/ft-app-icon.svg"] = svg(chosen, title).encode()
     for n in (16, 24, 32, 48, 64, 128, 256, 512, 1024):
