@@ -1,6 +1,6 @@
 # 0010 – Windows checks on the owner's PC (file names, long paths)
 
-**Who:** worker, then the owner · **Status:** open – can start · **Lane:** Format
+**Who:** worker, then the owner · **Status:** waiting for the owner · **Lane:** Format
 **Repository it changes:** `smholte/toolbox-format` · **Branch:** `task/0010-windows-checks`
 **Started by:** lead, 19 Nov 2026 · **Model:** Sonnet · effort Medium · **Merge:** worker merges after a green GitHub run
 
@@ -56,10 +56,26 @@ Changing any rule of the format (that is task 0011); Python on Windows (W2, W3).
 
 ## Report (filled in by the chat that did the task)
 
-**Chat / date:**
+**Chat / date:** worker, Claude Code on the web, 20 Nov 2026 (first half; the second half follows the owner's output)
 
-**What changed:**
+**What changed:** on branch `task/0010-windows-checks` of `smholte/toolbox-format` (not merged yet): `tools/windows-checks.ps1`
+(W1, W4, W5; works only in `%USERPROFILE%\Toolbox-check`, deletes it, prints one line per check and copies the text to
+the clipboard), a "Windows checks" section in `README.md`, and a second job `windows-checks` in the workflow.
 
-**Tested and measured** (name the machine, the browser, the version):
+**Tested and measured:** GitHub's Windows machine (Windows 10.0.26100, PowerShell 5.1), run 44815888755, both jobs green.
+Its output – **not the owner's PC and not a rule yet**: W1 all 14 names made a real file (listed and read back);
+W4 path of 317 characters written, read and deleted (but "LongPathsEnabled" was 1 there, so this says nothing about
+the owner's PC); W5 all four pairs gave two files; clean-up done. Of note: even `aux` and `COM¹` made files – so the
+owner's output decides, because the .NET calls the script uses may differ from what Edge, Blender or Python do.
 
-**Open points / follow-up tasks:**
+**Steps for the owner** (also in `toolbox-format/README.md`, "Windows checks"):
+1. Open https://github.com/smholte/toolbox-format/blob/task/0010-windows-checks/tools/windows-checks.ps1 , click the
+   download arrow ("Download raw file", top right of the file), save it in `Downloads`.
+2. Windows key, type `powershell`, click **Windows PowerShell** (not as administrator).
+3. Paste this line, press Enter:
+   `powershell -NoProfile -ExecutionPolicy Bypass -File "$env:USERPROFILE\Downloads\windows-checks.ps1"`
+4. You should see about 40 lines starting `W1`, `W4`, `W5` and last `Clean up: done`. The text is on your clipboard:
+   paste it into the chat of this task.
+
+**Open points / follow-up tasks:** owner's output → this report, `toolbox-format/CLAUDE.md` "Things learned", merge
+(a worker continues "task 0010 from its branch"). W2/W3 go to Fresing Render's own Windows tests (the lead tells that lead).
