@@ -1,6 +1,6 @@
 # 0011 – Format 0.2: the rule problems the review found
 
-**Who:** worker · **Status:** running (worker, started 20 Nov 2026) · **Lane:** Format
+**Who:** worker · **Status:** branch pushed, waiting for lead review (20 Nov 2026) · **Lane:** Format
 **Repository it changes:** `smholte/toolbox-format` · **Branch:** `task/0011-format-0.2`
 **Started by:** lead, 19 Nov 2026 · **Model:** Opus · effort High · **Merge:** lead review before merge, then both neighbour leads review (CLAUDE.md section 6)
 
@@ -77,10 +77,65 @@ Router, apps, the trial page beyond what a rule change needs, making a tag.
 
 ## Report (filled in by the chat that did the task)
 
-**Chat / date:**
+**Chat / date:** worker chat in Claude Code on the web, 20 Nov 2026. Branch `task/0011-format-0.2` of
+`smholte/toolbox-format`, two commits (`a50e843`, `11770b8`), **pushed, not merged**.
 
 **What changed:**
 
+- **All of P1–P32 are done**; none left out. Each decision is in `FORMAT.md` (new section 14 lists P1–P32 with the
+  section it changed), in the schemas, in `tbf/` and in `web/toolbox-folder.js` alike, with tests. `VERSION` and all
+  samples are 0.2. `CHANGELOG.md` starts with a short **"What changed for tool authors"** (10 points, for the leads),
+  then one line per P-number with what an app has to do and where the simpler choice was taken (P2, P10, P15, P17,
+  P20, P22).
+- Places where I went beyond the decision, and why:
+  - **P5:** plain `upper()` cannot be used. Python 3.11–3.13 and Chrome give different capitals for about 55
+    characters (Chrome knows newer Unicode). So "compared in capitals" means: characters below U+0590 (Latin, Greek,
+    Cyrillic, Armenian) whose capital is also below U+0590 become that capital; others stay as written. It covers
+    `ſ`/`s`, `µ`/`μ`, `ı`/`I`. It gives the same answer in both languages for every one of the 1.1 million
+    characters (tested).
+  - **P1:** a copy that holds a job must write its status every 2 minutes (else 5 minutes later another copy takes
+    it up). The review had proposed this; without it a `waiting` job ("Bake now?") would be taken over. Taking up
+    uses a short lock file `.taking-up` so that of several copies only one wins.
+  - **P20:** a missing or short file is now `bad-job` at once (the simpler of "helper or drop the sentence").
+  - **P25:** JavaScript had no `clean()`; it has one now, compared with Python.
+- Item 4: the trial test that failed once on GitHub now waits for the page, stops the stand-in tab first and skips
+  the browser's `.crswap` files. The 0.1.1 changelog heading says "tag `v0.1.1` (20 Nov 2026)".
+- An **independent reviewer** (a separate agent that did not write the code) checked the branch. It found no case
+  where the two languages disagree (about 250 000 random cases). It did find **4 real problems**, all fixed in the
+  second commit, each with a test:
+  1. A line break in a status text (an error message) made `status.json` unreadable, so a final status could be
+     overwritten.
+  2. A broken key in a job crashed Python's `refuse()` and `check.py`.
+  3. My first take-up design could, in a very narrow timing, let two copies hold one job.
+  4. That first design could also leave a stray file behind on Windows.
+
 **Tested and measured** (name the machine, the browser, the version):
 
+- Cloud Linux container: all **351 tests pass** with Python 3.13.18 and Chrome 153.0.8010.12 (Playwright 1.63).
+  The 278 Python-only tests also pass with Python 3.11 and 3.12. Samples up to date; `check.py` OK.
+- **GitHub: green on the last commit** (run 44824545300, 351 passed, Chrome tests included; the Windows script job
+  green too).
+- Take-up with 8 copies at once: exactly one winner in 1500 of 1500 rounds. The worst order of steps is forced in a
+  test.
+- The only patterns left (the built-in IFC/STEP one) take well under a second on hostile 64 KiB files.
+- The formerly flaky trial test: passed 15 of 15 runs in a row in the container.
+- **Not tested on Windows:** the lock file and the rewritten status while another program reads it. The Windows job
+  on GitHub runs only the PowerShell script, not the tests. This is an expectation: `O_EXCL` and replace work on NTFS,
+  and a failed replace is "try again".
+
 **Open points / follow-up tasks:**
+
+1. **Lead review of the branch, then the two neighbour leads** (CHANGELOG "What changed for tool authors"). Two
+   questions are addressed to them there:
+   - House Planner: a `scene.json` is now recognised only when it is at most 64 levels deep.
+   - Fresing Render: a tool that may run as several copies no longer deletes `alive.json`.
+2. **Upgrading is all-or-nothing until 1.0.** A 0.2 tool reads no 0.1 file. The owner's own Toolbox folder from the
+   trial (task 0002) has a 0.1 marker: after the merge the trial page will say "version" until the folder is marked
+   0.2. A native 0.2 tool does that by itself; a page may not. The owner deletes `toolbox-folder.json` there, or the
+   whole trial folder, and lets the trial page set it up again.
+3. Accepted limits, written down:
+   - NFC differs between Python and Chrome only for 20 characters of four scripts new in Unicode 16.
+   - Cleaning up by `created` trusts the sender's clock: a `created` far in the future is never cleaned, and one more
+     than 30 days in the past is deleted at once. The format allows this; a later version could ignore such dates.
+4. Suggested small task: run `pytest` (the Python part) on `windows-latest` in GitHub's workflow, so the folder code
+   is tested on NTFS at every push.
