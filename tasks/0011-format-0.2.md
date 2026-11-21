@@ -239,3 +239,44 @@ take it as "the job has ended"; it reads the status when it needs to know.
 
 **Next:** the branch goes to the House Planner and Fresing Render leads (lead post, 21 Nov). With both OKs: merge, the
 owner tags `v0.2`, then 0005.
+
+---
+
+## Round 3 (lead, 21 Nov 2026) – from task 0005's findings
+
+Task 0005 (the router's folder, built on this branch) found points for the format. One of them breaks the main use
+case of 0.2 at random, so they go in **before the tag**. Same branch, same rules (both languages, tests, changelog).
+**Opus · Medium.** Then stop again for the lead; add a short "Round 3" report below.
+
+1. **An empty `job.json` is "not there yet", not `bad-job`** (0005 point 2a). In Chrome,
+   `getFileHandle('job.json', {create: true})` puts an empty `job.json` on disk at once; `createWritable()` swaps the
+   content in only at `close()`. A receiver that looks in that moment – Fresing Render, a native tool, receiving from
+   House Planner, a web tool – refuses the job as `bad-job` today, in `take()` of both languages. Change:
+   - `take()` / `take()` in JavaScript: a `job.json` of **0 bytes** is `not-complete` (Python: the same "try again at
+     the next look" as a file that cannot be read right now). Only empty – a non-empty `job.json` that is not JSON
+     stays `bad-job` (a swapping writer never shows half a file).
+   - `pending()` / `unfinished()` and the 30-day clean-up keep working with a `job.json` that stays empty for ever
+     (a sender that crashed): it is never taken, and cleaned up by its newest file's date as a missing one is.
+   - `FORMAT.md` 6.2: correct the sentence that says a browser's `createWritable()` makes `job.json` appear whole – it
+     appears empty first, then whole. 6.3 step 1: "No `job.json`, or an empty one: leave it alone." Also check the
+     same for `status.json` and `cancel.json` written by a web tool (an empty `status.json` is already "not there
+     yet" for its reader, section 2; an empty `cancel.json` counts as there – confirm both in a test).
+   - A test in both languages that failed before: a receiver taking a job while `job.json` is empty, then again once
+     it is written – the job is taken, not refused.
+   - Do **not** make the web sender write under another name and `move()`: not every browser has `move()` on a local
+     folder, and the receiver's rule covers every sender.
+2. **A read error is never a verdict** (0005 points 2b, 2c). `zipIndex` / `zipRead` (and the Python twins, if they do
+   the same) turn a read error into "not a zip", so a file another program holds for a moment can end `wrong-type`
+   for good: a read error must come out as "cannot be read right now" (`not-complete`). And `open()` must report a
+   `toolbox-folder.json` it cannot read right now as that, not as "not the Toolbox folder". A test for each that
+   failed before.
+3. **The marker of another version** (0005 point 2d – the lead's decision): section 2 says a native tool that finds
+   `toolbox-folder.json` of another version writes it again with its own. With two native tools of different versions
+   on one PC that flips the marker at every start. New rule: a native tool rewrites the marker **only when its version
+   is older** than its own; a **newer** marker it leaves alone and says so to its user. Text in section 2, the
+   reference code if it does this, a test, a changelog line. (The router follows this when 0005 is continued.)
+4. **Texts only:** 7.4 "delete `job.json` first" when deleting a job folder (0005 point 2f, the review's point 12),
+   and in `CLAUDE.md` "Things learned": on NTFS, Node's writes and deletes are not refused by a reader (POSIX
+   semantics, measured in 0005 on Windows Server 2025); the refusals come from Python and .NET writers.
+
+The changelog's "What changed for tool authors" gets one or two short new points (1 and 3 concern every tool).
