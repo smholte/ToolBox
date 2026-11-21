@@ -18,7 +18,7 @@ waiting (for what) · running · done.
 | --- | --- | --- | --- | --- |
 | 0003 | Plan step B: [docs/step-b-router.md](docs/step-b-router.md), with the owner's six answers | done (18 Nov 2026) | lead | – |
 | 0004 | [The router's skeleton: tray app, drop window, installer, tests](tasks/0004-router-skeleton.md) | done – the owner's test on his PC passed (21 Nov 2026); three small findings → 0008 | worker · Opus · High | `task/0004-router-skeleton` |
-| 0005 | [The folder: adapter for the format's code, the router's own manifest, the list of tools](tasks/0005-router-folder.md) | open – can start (merge only after `v0.2` is tagged) | worker · Opus · High | `task/0005-router-folder` |
+| 0005 | [The folder: adapter for the format's code, the router's own manifest, the list of tools](tasks/0005-router-folder.md) | running (21 Nov 2026; merge only after `v0.2` is tagged) | worker · Opus · High | `task/0005-router-folder` |
 | 0006–0009 | The popup and routes · jobs · Windows integration and updates (with the owner's 0004 findings) · review and the owner's test list (listed in the plan) | waiting – each after the one before; its task file is written then | worker | – |
 
 ## Lane: Window (`smholte/ToolBox`)

@@ -1,6 +1,6 @@
 # 0005 – The folder: adapter for the format's code, the router's own manifest, the list of tools
 
-**Who:** worker · **Status:** open – can start · **Lane:** Router
+**Who:** worker · **Status:** running · **Lane:** Router
 **Repository it changes:** `smholte/ToolBox` · **Branch:** `task/0005-router-folder`
 **Started by:** lead, 21 Nov 2026 · **Model:** Opus · effort High · **Environment:** add `smholte/toolbox-format`
 (read only) · **Merge:** worker merges after a green GitHub run – **but only once the owner has tagged `v0.2`**
