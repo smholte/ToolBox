@@ -442,7 +442,7 @@ function holdOpen(p, ms, access = 'Read', share = 'Read') {
   });
 }
 
-test('Windows: what another program's open file does to a write and a delete (measured, logged)', { skip: !WINDOWS && 'Windows only' }, async (t) => {
+test('Windows: what another program\'s open file does to a write and a delete (measured, logged)', { skip: !WINDOWS && 'Windows only' }, async (t) => {
   const seen = [];
   for (const [access, share] of [['Read', 'Read'], ['Read', 'ReadWrite'], ['Read', 'None'], ['ReadWrite', 'Read'], ['ReadWrite', 'None'], ['Read', 'Delete']]) {
     const dir = tempDir('modes');
