@@ -21,3 +21,7 @@ p { margin: 0; }
 #name { font-weight: 600; overflow-wrap: anywhere; }
 #size, #more, #note { color: var(--muted); }
 #note { font-size: 12px; margin-top: 6px; }
+#zone { cursor: pointer; }
+#type { margin-top: 6px; }
+#typenote, #folder { color: #E8B04B; font-size: 12px; }
+#tools { overflow-wrap: anywhere; }

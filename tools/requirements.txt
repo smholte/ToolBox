@@ -1,2 +1,4 @@
-# For tools/make_icons.py (the icons). The app itself needs no Python.
+# For tools/make_icons.py (the icons) and for the tests: the format's checker (tests/format-checker) needs
+# jsonschema. The app itself needs no Python.
 pillow==12.3.0
+jsonschema==4.26.0

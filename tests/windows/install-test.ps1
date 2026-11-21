@@ -15,6 +15,7 @@ $approvedKey = 'HKCU:\Software\Microsoft\Windows\CurrentVersion\Explorer\Startup
 $runName = 'nl.fresing.toolbox'
 $appData = Join-Path $env:APPDATA 'Fresing ToolBox'
 $status = Join-Path $env:RUNNER_TEMP 'toolbox-status.json'
+$toolbox = Join-Path $env:USERPROFILE 'Toolbox'
 $script:failed = 0
 
 function Check([bool]$ok, [string]$what) {
@@ -81,6 +82,7 @@ function Snapshot {
 
 Write-Host "Installer: $($setup.Name) ($([math]::Round($setup.Length / 1MB, 1)) MB)"
 Check (-not (Test-Path $installDir)) 'not installed before the test'
+Check (-not (Test-Path $toolbox)) 'no Toolbox folder before the test'
 $before = Snapshot
 
 # 1. Install, for this user only, without questions.
@@ -106,6 +108,15 @@ Check ($state -and $state.tray) 'the installed app shows its tray icon'
 Check (-not $proc.HasExited) 'the tray process runs'
 Check ($state -and $state.autostartRegistered -eq $true) 'the app sees its own Start with Windows entry'
 Check ($state -and $state.dropWindowVisible -eq $false) 'started at login: no window, only the tray icon'
+
+# The Toolbox folder (task 0005): made at the first start in the user's home folder, with the router's manifest and
+# alive.json, and the format's own checker passes it.
+$state = WaitStatus { param($st) $st.folder -and $st.folder.state -eq 'ok' } 20
+Check ($state -and $state.folder.state -eq 'ok' -and $state.folder.path -eq $toolbox) "the Toolbox folder is made: $toolbox"
+Check (Test-Path (Join-Path $toolbox 'tools\nl.fresing.toolbox\toolbox.json')) "the router's manifest is in it"
+Check (Test-Path (Join-Path $toolbox 'tools\nl.fresing.toolbox\alive.json')) 'alive.json says the router is running'
+python (Join-Path $root 'tests\format-checker\check.py') $toolbox
+Check ($LASTEXITCODE -eq 0) "the format's checker passes the folder the installed app made"
 
 # A second start ends at once and brings up the first one's drop window.
 $second = Start-Process -FilePath $exe -PassThru
@@ -163,6 +174,9 @@ Check (@(UninstallEntries 'HKCU').Count -eq 0) 'the entry in Settings > Apps is 
 Check (-not (Test-Path $appData)) "the app's own data folder is gone"
 Check (-not (Test-Path (Join-Path $env:LOCALAPPDATA 'fresing-toolbox-updater'))) "the installer's own copy for updates is gone"
 Check ((MainProcesses).Count -eq 0) 'no process left'
+# The Toolbox folder is shared by every tool and stays. The router's own tool folder in it should go with an uninstall
+# (FORMAT.md 2) – the uninstaller does not do that yet (task 0008).
+Check (Test-Path (Join-Path $toolbox 'toolbox-folder.json')) 'the shared Toolbox folder stays'
 Check (-not (Test-Path "HKCU:\Software\Classes\AppUserModelId\$runName")) 'no AppUserModelId entry left'
 
 $after = Snapshot

@@ -27,6 +27,9 @@ function env(opts = {}) {
   if (opts.data) e.FRESING_TOOLBOX_DATA = opts.data;
   if (opts.status) e.FRESING_TOOLBOX_STATUS = opts.status;
   if (opts.langDir) e.FRESING_TOOLBOX_LANG_DIR = opts.langDir;
+  // Never the real Toolbox folder of the machine the tests run on: one of the test's own, or a new empty one.
+  e.FRESING_TOOLBOX_FOLDER = opts.folder || path.join(tempDir('folder'), 'Toolbox');
+  delete e.TOOLBOX_HOME;
   return e;
 }
 
@@ -102,4 +105,27 @@ async function dropWindow(app) {
   }, 'the drop window');
 }
 
-module.exports = { ROOT, tempDir, launch, runPlain, waitFor, clickMenu, menuItems, dropWindow };
+// ---------------------------------------------------------------- the format's samples and checker (task 0005)
+const SAMPLES = path.join(ROOT, 'tests', 'data', 'samples');
+const CHECKER = path.join(ROOT, 'tests', 'format-checker', 'check.py');
+const PYTHON = process.env.PYTHON || (process.platform === 'win32' ? 'python' : 'python3');
+
+/** a copy of the format's sample Toolbox folder (or of only its manifests), in a new temporary folder */
+function sampleFolder(manifestsOnly = false) {
+  const to = path.join(tempDir('samples'), 'Toolbox');
+  fs.cpSync(path.join(SAMPLES, 'Toolbox'), to, {
+    recursive: true,
+    filter: (src) => !manifestsOnly || !/[\\/]inbox[\\/]|alive\.json$/.test(src),
+  });
+  return to;
+}
+
+/** the format's own checker (Python) on a folder, a job or a manifest: { ok, out } – ok when it found no ERROR */
+function check(...paths) {
+  const { spawnSync } = require('child_process');
+  const r = spawnSync(PYTHON, [CHECKER, ...paths], { encoding: 'utf8' });
+  if (r.error) throw new Error(`the format's checker needs Python with jsonschema (${PYTHON}): ${r.error.message}`);
+  return { ok: r.status === 0, out: (r.stdout || '') + (r.stderr || '') };
+}
+
+module.exports = { ROOT, tempDir, launch, runPlain, waitFor, clickMenu, menuItems, dropWindow, SAMPLES, CHECKER, PYTHON, sampleFolder, check };

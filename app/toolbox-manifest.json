@@ -1,0 +1,14 @@
+{
+  "format": "toolbox-tool",
+  "version": "0.2",
+  "id": "nl.fresing.toolbox",
+  "name": "Fresing ToolBox",
+  "description": "Hands a file from one tool to the next: drop a file on it and it goes to the tool that takes it.",
+  "homepage": "https://github.com/smholte/ToolBox",
+  "kind": "native",
+  "icon": "icon.png",
+  "actions": [
+    { "id": "take-result", "label": "Take back a result", "accepts": [] }
+  ],
+  "handover": ["inbox"]
+}

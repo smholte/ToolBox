@@ -1,7 +1,7 @@
 {
   "name": "fresing-toolbox",
   "productName": "Fresing ToolBox",
-  "version": "0.1.0",
+  "version": "0.2.0",
   "description": "Fresing ToolBox – hands files from one tool to the next",
   "main": "app/main.js",
   "author": "Fresing",

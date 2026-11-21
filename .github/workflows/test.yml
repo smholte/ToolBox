@@ -1,5 +1,5 @@
 # Every push: the app's tests on Linux (under a virtual screen), and on Windows the installer built, installed,
-# started, tested and uninstalled (task 0004).
+# started, tested and uninstalled (task 0004); the Toolbox folder and its adapter on both (task 0005).
 name: test
 on:
   push:
@@ -24,7 +24,7 @@ jobs:
       - run: pip install -r tools/requirements.txt
       - name: Icons up to date
         run: python3 tools/make_icons.py --check
-      - name: Tests (units, texts, the app under a virtual screen)
+      - name: Tests (units, texts, the Toolbox folder, the app under a virtual screen)
         run: xvfb-run -a npm test
 
   windows:
@@ -36,9 +36,13 @@ jobs:
         with:
           node-version: 22
           cache: npm
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
       - run: npm ci
-      - name: Unit and text tests
-        run: node --test tests/units.test.js tests/texts.test.js
+      - run: pip install jsonschema==4.26.0
+      - name: Unit, text and Toolbox-folder tests (a file held open, a junction)
+        run: node --test --test-concurrency=1 tests/units.test.js tests/texts.test.js tests/folder.test.js
       - name: Build the installer
         run: npm run dist
       - name: Install, start, test, uninstall

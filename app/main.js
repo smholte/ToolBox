@@ -1,6 +1,7 @@
 'use strict';
-// Fresing ToolBox – the router's frame (task 0004): a tray icon with its menu, one instance only, and a small drop
-// window that shows the name and size of a dropped file. Handing files to tools comes in tasks 0005–0007.
+// Fresing ToolBox – the router: a tray icon with its menu, one instance only (task 0004), the Toolbox folder and a
+// small drop window that shows a dropped file's type and the tools that take it (task 0005). Handing files to tools
+// comes in tasks 0006–0007.
 
 const { app, BrowserWindow, Tray, Menu, dialog, ipcMain, nativeImage } = require('electron');
 const fs = require('fs');
@@ -8,6 +9,7 @@ const path = require('path');
 const i18n = require('./i18n');
 const settingsStore = require('./settings');
 const autostart = require('./autostart');
+const { RouterFolder, folderPath, TF } = require('./toolbox');
 
 const ICONS = path.join(__dirname, 'icons');
 
@@ -24,6 +26,8 @@ const state = {
   quitting: false,
   secondInstances: 0,
   lastDrop: null,
+  lastLook: null,
+  folder: null,
 };
 
 function writeStatus() {
@@ -46,6 +50,8 @@ function writeStatusFile() {
     dropWindowVisible: !!state.dropWindow && !state.dropWindow.isDestroyed() && state.dropWindow.isVisible(),
     secondInstances: state.secondInstances,
     lastDrop: state.lastDrop,
+    lastLook: state.lastLook,
+    folder: state.folder ? state.folder.summary() : null,
   };
   fs.writeFileSync(STATUS_FILE + '.tmp', JSON.stringify(status, null, 2));
   // Windows refuses the rename while a reader has the file open: try a few times.
@@ -109,8 +115,8 @@ function createTray() {
 
 function createDropWindow() {
   const win = new BrowserWindow({
-    width: 380,
-    height: 280,
+    width: 420,
+    height: 340,
     show: false,
     resizable: false,
     maximizable: false,
@@ -147,6 +153,7 @@ function createDropWindow() {
 }
 
 function showDropWindow() {
+  folderChanged();
   const win = state.dropWindow && !state.dropWindow.isDestroyed() ? state.dropWindow : createDropWindow();
   if (win.webContents.isLoading()) {
     win.once('ready-to-show', () => {
@@ -205,7 +212,46 @@ function showAbout() {
 function quit() {
   state.quitting = true;
   if (state.tray && !state.tray.isDestroyed()) state.tray.destroy();
-  app.quit();
+  // alive.json goes first (the router runs as one copy, FORMAT.md 6.4); a slow disk does not hold up quitting.
+  const closing = state.folder ? state.folder.close() : Promise.resolve();
+  Promise.race([closing, new Promise((r) => setTimeout(r, 1500))]).finally(() => app.quit());
+}
+
+/** the Toolbox folder's state as the drop window shows it */
+function folderView() {
+  const f = state.folder ? state.folder.summary() : { path: folderPath(), state: 'unknown' };
+  return Object.assign(f, { mine: TF.VERSION });
+}
+
+function folderChanged() {
+  if (state.dropWindow && !state.dropWindow.isDestroyed()) state.dropWindow.webContents.send('toolbox:folder-changed');
+}
+
+/** What the drop window shows about a dropped or chosen file: the first one that is not a folder. */
+async function look(files) {
+  const first = files.find((f) => !f.folder);
+  if (!first) return null;
+  if (!first.path) return { kind: 'no-path', folder: folderView() };
+  const seen = await state.folder.look(first.path);
+  seen.folder = folderView();
+  state.lastLook = seen;
+  writeStatus();
+  return seen;
+}
+
+async function connectFolder() {
+  state.folder = new RouterFolder({
+    path: folderPath(),
+    appVersion: app.getVersion(),
+    program: process.execPath,
+    // From a checkout Electron needs the app's folder; the installed app is the program alone.
+    args: app.isPackaged ? [] : [app.getAppPath()],
+    icon: path.join(ICONS, 'app_256px.png'),
+  });
+  await state.folder.connect();
+  state.folder.start();
+  folderChanged();
+  writeStatus();
 }
 
 function start() {
@@ -218,14 +264,19 @@ function start() {
   autostart.sync(app, state.settings.startWithWindows);
 
   ipcMain.handle('toolbox:texts', () => ({ texts: state.t.all(), locale: state.t.locale }));
-  ipcMain.on('toolbox:dropped', (event, files) => {
-    if (!Array.isArray(files)) return;
-    state.lastDrop = files.slice(0, 100).map((f) => ({
+  ipcMain.handle('toolbox:folder', () => folderView());
+  ipcMain.handle('toolbox:dropped', async (event, files) => {
+    if (!Array.isArray(files)) return null;
+    const list = files.slice(0, 100).map((f) => ({
       name: String(f && f.name),
       size: Number(f && f.size) || 0,
       folder: !!(f && f.folder),
+      path: typeof (f && f.path) === 'string' ? f.path : '',
     }));
+    state.lastDrop = list.map(({ name, size, folder }) => ({ name, size, folder }));
     writeStatus();
+    if (!state.folder) return null;
+    return look(list);
   });
 
   createTray();
@@ -233,6 +284,7 @@ function start() {
   // Started by Windows at login: stay in the tray. Started by the user: show the drop window.
   if (!process.argv.includes('--autostart')) showDropWindow();
   writeStatus();
+  connectFolder();
 }
 
 if (!app.requestSingleInstanceLock()) {

@@ -13,11 +13,16 @@ const LANG = path.join(APP, 'lang');
 const en = JSON.parse(fs.readFileSync(path.join(LANG, 'en.json'), 'utf8'));
 const keys = Object.keys(en).filter((k) => !k.startsWith('_'));
 
+// Not scanned for texts: the format's code, copied unchanged (its messages are never shown: the drop window shows
+// texts from en.json only), and the adapter under it (its error messages go to the format's code, never to the user).
+const NOT_SHOWN = [path.join(APP, 'vendor'), path.join(APP, 'folder.js')];
+
 function appFiles(ext) {
   const out = [];
   const walk = (dir) => {
     for (const e of fs.readdirSync(dir, { withFileTypes: true })) {
       const p = path.join(dir, e.name);
+      if (NOT_SHOWN.includes(p)) continue;
       if (e.isDirectory()) walk(p);
       else if (p.endsWith(ext)) out.push(p);
     }
