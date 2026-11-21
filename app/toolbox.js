@@ -67,7 +67,7 @@ class RouterFolder {
     this.opts = opts;
     this.path = opts.path || folderPath();
     this.box = null;
-    this.state = 'unknown';      // ok · other-version · not-toolbox · not-a-folder · error
+    this.state = 'unknown';      // ok · connecting · other-version · not-toolbox · not-a-folder · error · gone
     this.version = null;         // the version of a folder of another version
     this.pending = new Set();    // what could not be written yet: 'manifest', 'icon'
     this.lastError = null;       // for the log and the tests only
@@ -89,13 +89,16 @@ class RouterFolder {
   async _connect() {
     this.box = null;
     this.version = null;
+    // 'connecting' until the router's own files are written: 'ok' means they are there (or will be at the next tick)
+    this.state = 'connecting';
+    let found;
     try {
-      this.state = await this._open();
+      found = await this._open();
     } catch (err) {
-      this.state = 'error';
+      found = 'error';
       this.lastError = String(err && err.message);
     }
-    if (this.state === 'ok') {
+    if (found === 'ok') {
       this.pending = new Set(['manifest', 'icon']);
       for (const p of [this.path, path.join(this.path, 'tools', ME)]) await adapter.removeTemps(p);
       try {
@@ -105,6 +108,7 @@ class RouterFolder {
         this.lastError = String(err && err.message);
       }
     }
+    if (this.state === 'connecting') this.state = found;   // else a write found the folder gone meanwhile
     return this.summary();
   }
 
