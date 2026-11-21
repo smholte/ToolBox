@@ -17,8 +17,9 @@ waiting (for what) · running · done.
 | No. | Title | Status | Who · model · effort | Branch |
 | --- | --- | --- | --- | --- |
 | 0003 | Plan step B: [docs/step-b-router.md](docs/step-b-router.md), with the owner's six answers | done (18 Nov 2026) | lead | – |
-| 0004 | [The router's skeleton: tray app, drop window, installer, tests](tasks/0004-router-skeleton.md) | waiting for the owner: test on his PC (steps in the task file); icon chosen (A9); the rest is done and on `main` (20 Nov 2026) | worker · Opus · High | `task/0004-router-skeleton` |
-| 0005–0009 | The folder · the popup and routes · jobs · Windows integration and updates · review and the owner's test list (listed in the plan) | waiting – each after the one before; its task file is written then | worker | – |
+| 0004 | [The router's skeleton: tray app, drop window, installer, tests](tasks/0004-router-skeleton.md) | done – the owner's test on his PC passed (21 Nov 2026); three small findings → 0008 | worker · Opus · High | `task/0004-router-skeleton` |
+| 0005 | [The folder: adapter for the format's code, the router's own manifest, the list of tools](tasks/0005-router-folder.md) | open – can start (merge only after `v0.2` is tagged) | worker · Opus · High | `task/0005-router-folder` |
+| 0006–0009 | The popup and routes · jobs · Windows integration and updates (with the owner's 0004 findings) · review and the owner's test list (listed in the plan) | waiting – each after the one before; its task file is written then | worker | – |
 
 ## Lane: Window (`smholte/ToolBox`)
 
@@ -35,6 +36,7 @@ Nothing yet; after the router.
 
 | When | What | Where |
 | --- | --- | --- |
+| 21 Nov 2026 | Task 0004: the router's skeleton, installer 0.1.0 (draft release), icon A9; the owner's test on his PC passed | `smholte/ToolBox` |
 | 20 Nov 2026 | Task 0010: Windows checks script, run by the owner; results in `toolbox-format/CLAUDE.md` | `smholte/toolbox-format` |
 | 18 Nov 2026 | Toolbox format 0.1 written, reviewed by the leads of House Planner and Fresing Render, tagged `v0.1` (before these rules, by the planning chat) | `smholte/toolbox-format`, FORMAT.md section 13 |
 | 18 Nov 2026 | Briefs to the leads of House Planner and Fresing Render for their side of step D | Fresing Render: its task 0217 |

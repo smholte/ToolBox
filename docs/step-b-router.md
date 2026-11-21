@@ -62,6 +62,13 @@ organisation; installing tools from a catalogue; chains and converters; macOS an
 | 0008 | Windows: "Open with" and "Send to", start with Windows, updates from GitHub Releases | right-click → Open with Toolbox works on the owner's PC; an update installs itself |
 | 0009 | Independent review of all Windows-only code, and the owner's test list click by click | the review's findings are fixed or listed; the owner has run the list |
 
+### Found in the owner's test of 0004 (21 Nov 2026) – for 0008
+
+- The tray icon lands in Windows' overflow (under ^); only the user can move it next to the clock. Tell the user
+  once how (Settings → Personalization → Taskbar → Other system tray icons → Fresing ToolBox on), e.g. on first start.
+- The uninstaller asks "Fresing ToolBox is running. Click OK to close it": it should close the app by itself.
+- The installer and uninstaller show NSIS's default side picture: replace with a Fresing one (from `brand/`).
+
 ## Decided by the owner (18 Nov 2026)
 
 1. **Windows only** at first.

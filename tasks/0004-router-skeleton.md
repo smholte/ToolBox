@@ -1,6 +1,6 @@
 # 0004 – The router's skeleton: tray app, drop window, installer, tests
 
-**Who:** worker · **Status:** waiting for the owner – his PC test (icon chosen: A9; everything else done, 20 Nov 2026) · **Lane:** Router
+**Who:** worker · **Status:** done – the owner's test on his PC passed (21 Nov 2026) · **Lane:** Router
 **Repository it changes:** `smholte/ToolBox` · **Branch:** `task/0004-router-skeleton`
 **Started by:** lead, 18 Nov 2026 · **Model:** Opus · effort High · **Environment:** add `smholte/Fresing` (read only) · **Merge:** worker merges after a green GitHub run
 
@@ -54,7 +54,7 @@ installer, the tests on GitHub (also on Windows), the texts in a language file, 
 
 ## Done when
 
-- [ ] The installed app shows its tray icon on GitHub's Windows machine (the test) and on the owner's PC (his steps)
+- [x] The installed app shows its tray icon on GitHub's Windows machine (the test) and on the owner's PC (his steps, 21 Nov 2026)
 - [x] One instance only; the drop window shows a dropped file's name and size; Quit really quits
 - [x] Start with Windows can be switched off and stays off after a restart of the app
 - [x] All texts come from `en.json`; the two text tests pass
@@ -226,3 +226,24 @@ bar 30, radii 52/16, 22.8° cuts). The Fresing lead may want to check the drafts
   (Electron reports the Run value, not that note); the app no longer undoes it. Could be shown in 0008.
 - Test hooks in the app (`FRESING_TOOLBOX_DATA`, `_STATUS`, `_LANG_DIR`) do nothing unless set; 0009's review may
   want them behind a build switch.
+
+---
+
+## The owner's test on his PC (21 Nov 2026, written by the lead from his screenshots)
+
+Windows 11, draft release 0.1.0 (A9 icon). **Passed:**
+
+- Install; the drop window opened by itself; a dropped `Untitled.step` showed "Untitled.step · 14 KB".
+- Start with Windows unticked, Quit, started again: still unticked; ticked again. About: "Fresing ToolBox 0.1.0".
+- After a restart the app started in the background (no window), icon present; clicking it opens the drop window at once.
+- Settings → Installed apps shows "Fresing ToolBox · 0.1.0 · Fresing" (357 MB); Uninstall ran to "Completing".
+
+**Found (none blocks 0004; they go to 0008, see `docs/step-b-router.md`, "Found in the owner's test"):**
+
+1. **The icon lands in the overflow** (under the ^ arrow), not next to the clock. Windows puts every new tray icon
+   there and lets only the user move it; an app cannot. The owner pins it himself (Settings → Personalization →
+   Taskbar → Other system tray icons). The app could say so once.
+2. **Uninstall asks "Fresing ToolBox is running. Click OK to close it."** The uninstaller should close the app itself.
+3. **The installer's and uninstaller's side picture is NSIS's default** (blue, a laptop), not Fresing's.
+4. Installed size 357 MB (Electron), as expected; 0008 decides on the second copy for updates.
+
