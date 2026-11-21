@@ -1,6 +1,6 @@
 # 0011 – Format 0.2: the rule problems the review found
 
-**Who:** worker · **Status:** branch pushed, waiting for lead review (20 Nov 2026) · **Lane:** Format
+**Who:** worker · **Status:** lead review 21 Nov 2026: three changes asked (section "Lead review" at the end) – open, can start on the same branch · **Lane:** Format
 **Repository it changes:** `smholte/toolbox-format` · **Branch:** `task/0011-format-0.2`
 **Started by:** lead, 19 Nov 2026 · **Model:** Opus · effort High · **Merge:** lead review before merge, then both neighbour leads review (CLAUDE.md section 6)
 
@@ -139,3 +139,40 @@ Router, apps, the trial page beyond what a rule change needs, making a tag.
      than 30 days in the past is deleted at once. The format allows this; a later version could ignore such dates.
 4. Suggested small task: run `pytest` (the Python part) on `windows-latest` in GitHub's workflow, so the folder code
    is tested on NTFS at every push.
+
+---
+
+## Lead review (21 Nov 2026)
+
+Read: the report, `CHANGELOG.md` "What changed for tool authors", `tbf/folder.py` (`write_json`, `write_status`,
+`take_up`) and `tools/standin.py`, together with Fresing Render's Windows results of 21 Nov (their task 0245, run on
+GitHub's Windows machine, Windows Server 2025 10.0.26100, Python 3.13.13 in Blender 5.2.3 and Python 3.11.9).
+
+**Approved as done:** all of P1–P32, including the places that went beyond the decision: P5's capitals below U+0590
+(same answer in both languages is what counts), P1's status every 2 minutes with the `.taking-up` lock, P20's
+`bad-job` at once, P25's `clean()` in JavaScript. The accepted limits under open point 3 stay as written.
+
+**Three changes before the branch goes to the neighbour leads** (same branch, then stop again for the lead):
+
+1. **W3 – a refused status write must not stop a job.** Fresing Render measured on Windows: a reader that holds
+   `status.json` open blocks the replace as long as it holds it – refusals up to **0.5 s**, so the 5 × 50 ms in
+   `write_json` is too short. On this branch `write_status()` still raises after that, and `tools/standin.py`
+   does not catch it: the stand-in stops mid-bake. Change:
+   - a status that is **not final** (`waiting`, `working`): when the replace is refused, `write_status()` returns
+     false ("not written now, write again at the next update") instead of raising;
+   - a **final** status (`done`, `failed`, `cancelled`) keeps trying for up to 2 s (about 4× the longest refusal
+     measured), then raises – the caller tries again at its next look;
+   - the stand-in survives a refused write; `FORMAT.md` section 2 says the same in words (no number of tries in
+     the rule); `CHANGELOG.md` gets the line for tool authors;
+   - a test that holds `status.json` open (as a slow reader does) while the stand-in writes; on Linux, simulate the
+     refusal. JavaScript: check whether `writeStatus()` can be refused the same way in a browser and keep both sides
+     saying the same; if it cannot, say so in the report.
+2. **Run `pytest` on `windows-latest`** in the workflow (your open point 4), so the lock file, the status rewrite
+   and the W3 test above run on NTFS before 0.2 goes out. The report then says what ran there.
+3. **Blender runs Python 3.13** (Blender 5.2.3), not 3.11: fix the text in `tbf/folder.py` (`is_link` docstring), the
+   0.2 changelog line on junctions and the 0.1.1 changelog line that says "Python 3.11 (Blender)". The 3.11 path stays
+   supported and tested.
+
+Model and effort for this round: **Opus · Medium** (fixes along the existing pattern, but Windows behaviour in
+format code). Report: add a short "Round 2" under the report above.
+
