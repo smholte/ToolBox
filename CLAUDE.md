@@ -101,20 +101,21 @@ repository a task changes.
 `smholte/toolbox-format` keeps a `CLAUDE.md` of its own with the rules that belong to it (its tests, its "things
 learned"). A worker in that repository reads both.
 
-**Layout of this repository** (task 0004):
+**Layout of this repository** (tasks 0004, 0005):
 
 | Folder | Holds |
 | --- | --- |
-| `app/` | the router (Electron, plain JavaScript, no build step): `main.js` (tray, menu, drop window, one instance), `autostart.js` (Windows only), `i18n.js`, `settings.js`, `format.js`, the drop window (`drop.html`, `drop.js`, `drop.css`, `preload.js`), `icons/` (made by `tools/make_icons.py`) |
+| `app/` | the router (Electron, plain JavaScript, no build step): `main.js` (tray, menu, drop window, one instance), `autostart.js` (Windows only), `i18n.js`, `settings.js`, `format.js` (sizes, placeholders), the drop window (`drop.html`, `drop.js`, `drop.css`, `preload.js`), `icons/` (made by `tools/make_icons.py`); the Toolbox folder: `toolbox.js` (finds or makes the folder, the router's manifest `toolbox-manifest.json`, alive.json, the tools, a dropped file's type) and `folder.js` (the adapter: browser-like folder handles over `fs`) |
+| `app/vendor/toolbox-format/` | the format's `toolbox-folder.js`, **copied unchanged** with its licence and `SOURCE.md` (the commit) by `tools/copy-format.js`; never edited here |
 | `app/lang/` | every text the user sees: one file per language, `en.json` complete; the installer's texts too |
 | `installer/` | additions to electron-builder's Windows installer (`installer.nsh`, Windows only); `texts.nsh` is written at build time |
-| `tests/` | the tests (section 8); `tests/windows/` runs only on GitHub's Windows machine |
-| `tools/` | `make_icons.py` (the icons, Python + Pillow), `installer-texts.js` |
+| `tests/` | the tests (section 8); `tests/windows/` runs only on GitHub's Windows machine; `tests/data/samples/` (the format's samples) and `tests/format-checker/` (its Python checker), both copied unchanged by `tools/copy-format.js` |
+| `tools/` | `make_icons.py` (the icons, Python + Pillow), `installer-texts.js`, `copy-format.js` (copies the format's code, samples and checker from a checkout of `toolbox-format`: `node tools/copy-format.js <checkout> <tag>`) |
 | `brand/` | the app mark "Ft": the SVG, PNGs, the `.ico`, and the drafts the owner chose from (`brand/drafts/`) |
 | `docs/`, `tasks/` | plans, task files |
 | `.github/workflows/` | `test.yml` (every push), `release.yml` (by hand: installer from `main` as a draft release) |
 
-`package.json` holds the version (the app's, `0.1.0` and up) and the installer settings (`build`).
+`package.json` holds the version (the app's, `0.1.0` and up; `0.2.0` from task 0005) and the installer settings (`build`).
 
 ## 4. Tasks
 
@@ -183,21 +184,35 @@ them.
 
 ```bash
 npm ci                                    # once; Electron, electron-builder, Playwright (no browsers needed)
-xvfb-run -a npm test                      # Linux: units, texts, and the app itself under a virtual screen
-python3 tools/make_icons.py --check       # icons up to date (pip install -r tools/requirements.txt)
+pip install -r tools/requirements.txt     # once; Pillow (icons) and jsonschema (the format's checker)
+xvfb-run -a npm test                      # Linux: units, texts, the Toolbox folder, the app under a virtual screen
+python3 tools/make_icons.py --check       # icons up to date
 ```
 
 - `tests/units.test.js` – sizes, placeholders, languages, settings, installer texts.
 - `tests/texts.test.js` – **no text written straight into the code or pages**, every key of `en.json` used and every
   key used present, other language files only with English keys. A new text goes into `en.json` first.
-- `tests/app.test.js` – the app started through Playwright: tray menu, drop window (a dropped file's name and size),
-  one instance, Start with Windows off and still off after a restart, the language setting, Quit.
+- `tests/folder.test.js` – the Toolbox folder, plain Node (no Electron): the adapter under the format's code against
+  the format's samples (every sample and damaged copies get the type the format's Python gives them), jobs and
+  statuses written through it checked by the format's checker (`tests/format-checker/check.py`), links/junctions
+  never followed, the router's folder (made, marked, left alone when of another version), a dropped file's type and
+  tools; on Windows also a file held open by another program (PowerShell) while the router writes over it.
+- `tests/app.test.js` – the app started through Playwright: tray menu, drop window (a dropped or chosen file's name,
+  size, type and the tools that take it – chosen through the window's file input, which has real paths), the
+  Toolbox folder made at start and checked, a folder of another version left alone, one instance, Start with
+  Windows off and still off after a restart, the language setting, Quit.
 - `tests/windows/install-test.ps1` – GitHub's Windows machine only: builds the installer, installs it without
-  questions, checks the files, Start-menu entry and autostart entry, starts the app as at login, starts it twice,
+  questions, checks the files, Start-menu entry and autostart entry, starts the app as at login (the real
+  `%USERPROFILE%\Toolbox` is made and passes the format's checker), starts it twice,
   runs `app.test.js` against the installed app (and the registry), uninstalls, and checks nothing is left behind.
-- GitHub runs both at every push (`.github/workflows/test.yml`); the Windows job takes about 3 minutes.
+- GitHub runs both at every push (`.github/workflows/test.yml`); the Windows job takes about 3 minutes. Both need
+  Python with `jsonschema` for the format's checker.
 - The app keeps test hooks that do nothing unless set: `FRESING_TOOLBOX_DATA` (settings folder),
-  `FRESING_TOOLBOX_STATUS` (a file the app writes its state to), `FRESING_TOOLBOX_LANG_DIR` (language files).
+  `FRESING_TOOLBOX_STATUS` (a file the app writes its state to), `FRESING_TOOLBOX_LANG_DIR` (language files),
+  `FRESING_TOOLBOX_FOLDER` (the Toolbox folder; `tests/helpers.js` always sets it, so a test never touches the real
+  one). The format's own `TOOLBOX_HOME` is obeyed too (FORMAT.md 2).
+- **The format's code is copied, never edited.** A new format version: `node tools/copy-format.js <checkout> <tag>`,
+  then the tests. A problem in that code goes to the Format lane as a finding, not into `app/vendor/`.
 
 ## 9. Things learned the hard way
 

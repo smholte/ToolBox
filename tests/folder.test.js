@@ -432,8 +432,8 @@ test('a dropped file: its type by content and the tools that take it', async () 
 // ---------------------------------------------------------------- Windows: a file another program holds open
 /** Hold a file open the way many Windows programs do (others may read it, nobody may replace or delete it) for
     `ms`; resolves once it is held, with a promise for its end. */
-function holdOpen(p, ms) {
-  const script = `$f = [System.IO.File]::Open('${p.replace(/'/g, "''")}', 'Open', 'Read', 'Read'); [Console]::Out.WriteLine('held'); [Console]::Out.Flush(); Start-Sleep -Milliseconds ${ms}; $f.Close()`;
+function holdOpen(p, ms, access = 'Read', share = 'Read') {
+  const script = `$ErrorActionPreference = 'Stop'; $f = [System.IO.File]::Open('${p.replace(/'/g, "''")}', 'Open', '${access}', '${share}'); [Console]::Out.WriteLine('held'); [Console]::Out.Flush(); Start-Sleep -Milliseconds ${ms}; $f.Close()`;
   const child = spawn('powershell.exe', ['-NoProfile', '-NonInteractive', '-Command', script], { stdio: ['ignore', 'pipe', 'inherit'] });
   const ended = new Promise((ok) => child.on('exit', ok));
   return new Promise((ok, fail) => {
@@ -441,6 +441,38 @@ function holdOpen(p, ms) {
     child.on('exit', () => fail(new Error('the holder ended before it held the file')));
   });
 }
+
+test('Windows: what another program's open file does to a write and a delete (measured, logged)', { skip: !WINDOWS && 'Windows only' }, async (t) => {
+  const seen = [];
+  for (const [access, share] of [['Read', 'Read'], ['Read', 'ReadWrite'], ['Read', 'None'], ['ReadWrite', 'Read'], ['ReadWrite', 'None'], ['Read', 'Delete']]) {
+    const dir = tempDir('modes');
+    fs.mkdirSync(path.join(dir, 'job'));
+    const p = path.join(dir, 'job', 'status.json');
+    fs.writeFileSync(p, 'old');
+    const ended = await holdOpen(p, 2500, access, share);
+    let write = 'replaced';
+    const w = await (await adapter.directory(path.join(dir, 'job')).getFileHandle('status.json')).createWritable();
+    await w.write('new');
+    try {
+      await w.close();
+    } catch (err) {
+      write = err.name + ' ' + (err.message || '').slice(0, 60);
+    }
+    const content = fs.readFileSync(p, 'utf8');
+    let del = 'deleted';
+    try {
+      await adapter.directory(dir).removeEntry('job', { recursive: true });
+    } catch (err) {
+      del = err.name + ' ' + (err.message || '').slice(0, 60);
+    }
+    const left = fs.existsSync(path.join(dir, 'job')) ? fs.readdirSync(path.join(dir, 'job')) : null;
+    await ended;
+    seen.push({ access, share, write, content, del, left });
+    assert.ok(write === 'replaced' ? content === 'new' : content === 'old', 'whole or not at all');
+  }
+  console.log('held-file outcomes: ' + JSON.stringify(seen, null, 1));
+  t.diagnostic(JSON.stringify(seen));
+});
 
 test('Windows: a file held open by another program is not replaced; the old one stays, nothing is left beside it', { skip: !WINDOWS && 'Windows only' }, async () => {
   const dir = tempDir('held');
