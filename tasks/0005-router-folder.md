@@ -138,7 +138,9 @@ tests, merge into `main`, start the release workflow, and the owner tests (steps
 - Here (Linux container, Node 22.23, Electron 45.2.3 = Node 24.22, Python 3.13): `xvfb-run -a npm test` – 43 pass,
   2 skipped (Windows only); icons up to date.
 - GitHub, `ubuntu-24.04` and `windows-2025` (Node 22, Python 3.12): all green at every push since the second
-  commit, Windows including the installed app (see the run of the last commit).
+  commit; last code commit `a3aa252` green on both, Windows including the installed app (the folder it made passes
+  the checker). One timing race in the installed app's test was found there and fixed (the folder said "ok" a
+  moment before `alive.json` was written).
 - `tests/folder.test.js`: every sample file and ~190 renamed or damaged copies get exactly the type and note the
   format's Python gives (`check.py --type`); the sample folder read through the adapter as the format describes it
   (tools, statuses, the cancel, the reply taken); a round trip, a cancelled job, the router's own sent job and the
