@@ -97,6 +97,7 @@ class RouterFolder {
     }
     if (this.state === 'ok') {
       this.pending = new Set(['manifest', 'icon']);
+      for (const p of [this.path, path.join(this.path, 'tools', ME)]) await adapter.removeTemps(p);
       try {
         await this._writeOwn();
         await this.alive();
@@ -118,7 +119,8 @@ class RouterFolder {
     const root = adapter.directory(this.path);
     try {
       this.box = await TF.open(root, ME);
-      return 'ok';
+      // tools/ that is a link (or a file) is not followed: the format's code then has no tools folder
+      return this.box.tools ? 'ok' : (this.box = null, 'not-toolbox');
     } catch (err) {
       if (!(err instanceof TF.TbError)) throw err;
       if (err.code === 'version') {
@@ -130,7 +132,7 @@ class RouterFolder {
     // A native tool makes the folder (FORMAT.md 2): here an empty folder, or one with only an empty tools/.
     await writeFile(root, 'toolbox-folder.json', TF.toJson({ format: 'toolbox-folder', version: TF.VERSION }));
     this.box = await TF.open(root, ME);
-    return 'ok';
+    return this.box.tools ? 'ok' : (this.box = null, 'not-toolbox');
   }
 
   async _markerVersion() {
@@ -145,7 +147,7 @@ class RouterFolder {
   async _empty(root) {
     for await (const [name, h] of root.entries()) {
       if (name.endsWith('.crswap')) continue;
-      if (name === 'tools' && h.kind === 'directory') {
+      if (name.toLowerCase() === 'tools' && h.kind === 'directory') {
         for await (const inner of h.entries()) if (inner) return false;
         continue;
       }
@@ -178,7 +180,9 @@ class RouterFolder {
 
   _failed(err) {
     this.lastError = String(err && err.message);
-    if (isGone(err)) this.state = 'gone';           // the folder was deleted: made again at the next tick
+    // The folder, tools/ or the router's own folder was deleted (the format's code then meets a missing handle):
+    // made again at the next tick.
+    if (isGone(err) || err instanceof TypeError) this.state = 'gone';
     else if (!isRefusal(err)) throw err;
   }
 
@@ -196,7 +200,10 @@ class RouterFolder {
   async tick() {
     try {
       // not usable before, or deleted meanwhile (the format's code then fails without a clear error): look again
-      if (this.state !== 'ok' || !fs.existsSync(path.join(this.path, 'toolbox-folder.json'))) return await this.connect();
+      const own = path.join(this.path, 'tools', ME, 'toolbox.json');
+      if (this.state !== 'ok' || !fs.existsSync(path.join(this.path, 'toolbox-folder.json')) || !fs.existsSync(own)) {
+        return await this.connect();
+      }
       await this._writeOwn();
       await this.alive();
     } catch (err) {

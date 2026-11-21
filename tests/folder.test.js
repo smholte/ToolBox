@@ -570,3 +570,122 @@ test('a refused write of the router\'s manifest does not stop the app; it is wri
   assert.deepEqual(temps(root), []);
   await r.close();
 });
+
+// ---------------------------------------------------------------- from the independent review (task 0005)
+/** Replace one function of fs/promises for the length of `fn`. */
+async function patched(name, replacement, fn) {
+  const fsp = require('fs/promises');
+  const real = fsp[name];
+  fsp[name] = (...args) => replacement(real, ...args);
+  try {
+    return await fn();
+  } finally {
+    fsp[name] = real;
+  }
+}
+const eperm = (what) => Object.assign(new Error(`EPERM: operation not permitted, ${what}`), { code: 'EPERM' });
+
+test('review: tools/ or the router\'s own folder deleted while it runs is made again whole at the next tick', async () => {
+  const root = path.join(tempDir('toolsgone'), 'Toolbox');
+  const r = router(root);
+  await r.connect();
+  for (const gone of [path.join(root, 'tools'), path.join(root, 'tools', ME)]) {
+    fs.rmSync(gone, { recursive: true });
+    await r.tick();
+    await r.tick();
+    assert.equal(r.state, 'ok');
+    assert.deepEqual(tree(path.join(root, 'tools', ME)), ['alive.json', 'icon.png', 'inbox', 'toolbox.json'], gone);
+    const out = assertChecked(root);
+    assert.doesNotMatch(out, /WARNING/, out);
+  }
+  await r.close();
+});
+
+test('review: a tools/ that is a link is not followed; the folder counts as not a Toolbox folder', async () => {
+  const root = path.join(tempDir('toolslink'), 'Toolbox');
+  const outside = tempDir('toolsoutside');
+  fs.mkdirSync(root);
+  fs.writeFileSync(path.join(root, 'toolbox-folder.json'), '{"format": "toolbox-folder", "version": "0.2"}\n');
+  linkFolder(outside, path.join(root, 'tools'));
+  const r = router(root);
+  assert.equal((await r.connect()).state, 'not-toolbox');
+  assert.deepEqual(fs.readdirSync(outside), [], 'nothing written through the link');
+  assert.deepEqual(await r.tools(), []);
+  await r.close();
+});
+
+test('review: a refused look at the file being replaced is a refused write too (a working status waits, never throws)', async () => {
+  const root = sampleFolder(true);
+  const planner = await open(root, PLANNER);
+  const render = await open(root, RENDER);
+  const job = await planner.send({ to: RENDER, action: 'import-step', files: [await file(path.join(FILES, 'sample-part.step'))] });
+  await render.claim(job, 'working', { fraction: 0.1 });
+  const status = path.join(root, 'tools', RENDER, 'inbox', job, 'status.json');
+  const refuse = (real, p, ...rest) => (path.resolve(String(p)) === path.resolve(status) && !(rest[0] && rest[0].bigint) ? Promise.reject(eperm('lstat')) : real(p, ...rest));
+  const h = adapter.fileAt(status);
+  // the status is read by the format's code first (NotReadableError: half there, next time); the write then refused
+  await patched('lstat', refuse, async () => {
+    const w = await h.createWritable();
+    await w.write('x');
+    await assert.rejects(w.close(), { name: 'NoModificationAllowedError' });
+  });
+  assert.equal(JSON.parse(fs.readFileSync(status, 'utf8')).fraction, 0.1);
+  assert.deepEqual(temps(root), []);
+});
+
+test('review: a folder swapped for a link while it is deleted is not gone into', async () => {
+  const dir = tempDir('swap');
+  const outside = tempDir('swapoutside');
+  fs.writeFileSync(path.join(outside, 'keep.txt'), 'keep me');
+  fs.mkdirSync(path.join(dir, 'job', 'sub'), { recursive: true });
+  fs.writeFileSync(path.join(dir, 'job', 'sub', 'a.txt'), 'a');
+  const sub = path.join(dir, 'job', 'sub');
+  let swapped = false;
+  await patched('readdir', async (real, p, ...rest) => {
+    if (!swapped && path.resolve(String(p)) === sub) {
+      swapped = true;
+      fs.renameSync(sub, path.join(dir, 'moved'));
+      linkFolder(outside, sub);
+    }
+    return real(p, ...rest);
+  }, async () => {
+    await assert.rejects(adapter.directory(dir).removeEntry('job', { recursive: true }), { name: 'NoModificationAllowedError' });
+  });
+  assert.ok(swapped);
+  assert.equal(fs.readFileSync(path.join(outside, 'keep.txt'), 'utf8'), 'keep me');
+});
+
+test('review: a half-deleted job folder has lost its job.json first, so it is never taken for a new job', async () => {
+  const root = sampleFolder(true);
+  const planner = await open(root, PLANNER);
+  const render = await open(root, RENDER);
+  const job = await planner.send({ to: RENDER, action: 'import-step', files: [await file(path.join(FILES, 'sample-part.step'))] });
+  await render.writeStatus(job, 'done');
+  await patched('unlink', (real, p) => (path.basename(String(p)) === 'job.json' ? real(p) : Promise.reject(eperm('unlink'))), async () => {
+    assert.equal(await render.remove(RENDER, job), false, 'refused: tried again at the next look');
+  });
+  const left = fs.readdirSync(path.join(root, 'tools', RENDER, 'inbox', job)).sort();
+  assert.deepEqual(left, ['sample-part.step', 'status.json']);
+  assert.deepEqual(await render.pending(), []);
+  assert.equal(await render.remove(RENDER, job), true);
+});
+
+test('review: what a crash left of a write is cleared when the router connects; a fresh one stays', async () => {
+  const root = path.join(tempDir('temps'), 'Toolbox');
+  const r = router(root);
+  await r.connect();
+  const old = Date.now() / 1000 - 3600;
+  const own = path.join(root, 'tools', ME);
+  for (const [dir, name, age] of [[root, '.tb-00000000000a.tmp', old], [own, '.tb-00000000000b.tmp', old], [own, '.tb-00000000000c.tmp', null]]) {
+    fs.writeFileSync(path.join(dir, name), 'half');
+    if (age) fs.utimesSync(path.join(dir, name), age, age);
+  }
+  await r.connect();
+  assert.deepEqual(temps(root), ['tools/nl.fresing.toolbox/.tb-00000000000c.tmp']);
+  await r.close();
+});
+
+test('review: names Windows would change are refused on Windows', { skip: !WINDOWS && 'Windows only' }, async () => {
+  const d = adapter.directory(tempDir('winnames'));
+  for (const bad of ['a:b', 'a.', 'a ']) await assert.rejects(d.getFileHandle(bad, { create: true }), TypeError, bad);
+});
