@@ -429,9 +429,14 @@ test('a dropped file: its type by content and the tools that take it', async () 
   await r.close();
 });
 
-// ---------------------------------------------------------------- Windows: a file another program holds open
-/** Hold a file open the way many Windows programs do (others may read it, nobody may replace or delete it) for
-    `ms`; resolves once it is held, with a promise for its end. */
+// ---------------------------------------------------------------- a write another program refuses (Windows)
+// Measured on GitHub's Windows Server 2025 (task 0005): Node replaces and deletes a file even while another program
+// holds it open, whatever that program's sharing – Node renames and deletes with the newer "POSIX" semantics of
+// NTFS. (Python's os.replace does not, which is why Fresing Render's writes are refused: the format's CLAUDE.md.)
+// So on Windows a held file is tested as it really behaves, and a refusal – which can still come, e.g. on a drive
+// without those semantics – is forced inside the process, on every system.
+
+/** Hold a file open in another program (PowerShell) for `ms`; resolves once it is held, with a promise for its end. */
 function holdOpen(p, ms, access = 'Read', share = 'Read') {
   const script = `$ErrorActionPreference = 'Stop'; $f = [System.IO.File]::Open('${p.replace(/'/g, "''")}', 'Open', '${access}', '${share}'); [Console]::Out.WriteLine('held'); [Console]::Out.Flush(); Start-Sleep -Milliseconds ${ms}; $f.Close()`;
   const child = spawn('powershell.exe', ['-NoProfile', '-NonInteractive', '-Command', script], { stdio: ['ignore', 'pipe', 'inherit'] });
@@ -442,88 +447,126 @@ function holdOpen(p, ms, access = 'Read', share = 'Read') {
   });
 }
 
-test('Windows: what another program\'s open file does to a write and a delete (measured, logged)', { skip: !WINDOWS && 'Windows only' }, async (t) => {
+test('Windows: a file held open by another program – the write is whole, nothing is left beside it, a job folder still goes', { skip: !WINDOWS && 'Windows only' }, async (t) => {
   const seen = [];
-  for (const [access, share] of [['Read', 'Read'], ['Read', 'ReadWrite'], ['Read', 'None'], ['ReadWrite', 'Read'], ['ReadWrite', 'None'], ['Read', 'Delete']]) {
-    const dir = tempDir('modes');
+  for (const [access, share] of [['Read', 'Read'], ['Read', 'ReadWrite'], ['Read', 'None'], ['ReadWrite', 'None']]) {
+    const dir = tempDir('held');
     fs.mkdirSync(path.join(dir, 'job'));
     const p = path.join(dir, 'job', 'status.json');
     fs.writeFileSync(p, 'old');
-    const ended = await holdOpen(p, 2500, access, share);
+    const ended = await holdOpen(p, 2000, access, share);
     let write = 'replaced';
     const w = await (await adapter.directory(path.join(dir, 'job')).getFileHandle('status.json')).createWritable();
     await w.write('new');
     try {
       await w.close();
     } catch (err) {
-      write = err.name + ' ' + (err.message || '').slice(0, 60);
+      assert.equal(err.name, 'NoModificationAllowedError');
+      write = 'refused';
     }
-    const content = fs.readFileSync(p, 'utf8');
+    assert.equal(fs.readFileSync(p, 'utf8'), write === 'replaced' ? 'new' : 'old', 'whole or not at all');
+    assert.deepEqual(fs.readdirSync(path.join(dir, 'job')), ['status.json'], 'nothing left beside it');
     let del = 'deleted';
     try {
       await adapter.directory(dir).removeEntry('job', { recursive: true });
     } catch (err) {
-      del = err.name + ' ' + (err.message || '').slice(0, 60);
+      assert.equal(err.name, 'NoModificationAllowedError');
+      del = 'refused';
     }
-    const left = fs.existsSync(path.join(dir, 'job')) ? fs.readdirSync(path.join(dir, 'job')) : null;
     await ended;
-    seen.push({ access, share, write, content, del, left });
-    assert.ok(write === 'replaced' ? content === 'new' : content === 'old', 'whole or not at all');
+    seen.push(`${access}/${share}: write ${write}, delete ${del}`);
   }
-  console.log('held-file outcomes: ' + JSON.stringify(seen, null, 1));
-  t.diagnostic(JSON.stringify(seen));
+  t.diagnostic(seen.join('; '));
 });
 
-test('Windows: a file held open by another program is not replaced; the old one stays, nothing is left beside it', { skip: !WINDOWS && 'Windows only' }, async () => {
-  const dir = tempDir('held');
-  const p = path.join(dir, 'status.json');
-  fs.writeFileSync(p, 'old');
-  const ended = await holdOpen(p, 1500);
-  const w = await (await adapter.directory(dir).getFileHandle('status.json')).createWritable();
-  await w.write('new');
-  await assert.rejects(w.close(), { name: 'NoModificationAllowedError' });
-  assert.equal(fs.readFileSync(p, 'utf8'), 'old');
+/** Make every rename refused (as Windows refuses one) until `until()` says stop; returns the undo. */
+function refuseRenames(until) {
+  const fsp = require('fs/promises');
+  const real = fsp.rename;
+  let refused = 0;
+  fsp.rename = async (a, b) => {
+    if (until(refused)) return real(a, b);
+    refused += 1;
+    const err = new Error('EPERM: operation not permitted, rename');
+    err.code = 'EPERM';
+    throw err;
+  };
+  return { undo: () => { fsp.rename = real; }, count: () => refused };
+}
+
+test('a refused replace: tried a few times, then NoModificationAllowedError, the old file whole, nothing left beside it', async () => {
+  const dir = tempDir('refused');
+  fs.writeFileSync(path.join(dir, 'status.json'), 'old');
+  const h = await adapter.directory(dir).getFileHandle('status.json');
+  let r = refuseRenames(() => false);
+  try {
+    const w = await h.createWritable();
+    await w.write('new');
+    await assert.rejects(w.close(), { name: 'NoModificationAllowedError' });
+    assert.equal(r.count(), adapter.REPLACE_TRIES.count);
+  } finally {
+    r.undo();
+  }
+  assert.equal(fs.readFileSync(path.join(dir, 'status.json'), 'utf8'), 'old');
   assert.deepEqual(fs.readdirSync(dir), ['status.json']);
-  await ended;
-  const again = await (await adapter.directory(dir).getFileHandle('status.json')).createWritable();
-  await again.write('new');
-  await again.close();
-  assert.equal(fs.readFileSync(p, 'utf8'), 'new');
+  r = refuseRenames((n) => n >= 2);               // let go after two tries: the write gets through
+  try {
+    const w = await h.createWritable();
+    await w.write('new');
+    await w.close();
+  } finally {
+    r.undo();
+  }
+  assert.equal(fs.readFileSync(path.join(dir, 'status.json'), 'utf8'), 'new');
+  assert.deepEqual(fs.readdirSync(dir), ['status.json']);
 });
 
-test('Windows: a status held open by a reader – a working one waits for the next update, a final one is written once it is let go', { skip: !WINDOWS && 'Windows only' }, async () => {
+test('a refused status write: a working one waits for the next update, a final one keeps trying and is written (W3)', async () => {
   const root = sampleFolder(true);
   const planner = await open(root, PLANNER);
   const render = await open(root, RENDER);
   const job = await planner.send({ to: RENDER, action: 'import-step', files: [await file(path.join(FILES, 'sample-part.step'))] });
   await render.claim(job, 'working', { fraction: 0.1 });
   const status = path.join(root, 'tools', RENDER, 'inbox', job, 'status.json');
-  let ended = await holdOpen(status, 1500);
-  assert.equal(await render.writeStatus(job, 'working', { fraction: 0.2 }), false, 'not written now: the job goes on');
+  let r = refuseRenames(() => false);
+  try {
+    assert.equal(await render.writeStatus(job, 'working', { fraction: 0.2 }), false, 'not written now: the job goes on');
+  } finally {
+    r.undo();
+  }
   assert.equal(JSON.parse(fs.readFileSync(status, 'utf8')).fraction, 0.1);
-  await ended;
-  ended = await holdOpen(status, 700);
-  assert.equal(await render.writeStatus(job, 'done', { text: 'Imported' }), true, 'a final status keeps trying (2 s) and is written');
-  await ended;
+  const start = Date.now();
+  r = refuseRenames(() => Date.now() - start > 700);        // held for 0.7 s
+  try {
+    assert.equal(await render.writeStatus(job, 'done', { text: 'Imported' }), true, 'a final status keeps trying (2 s) and is written');
+  } finally {
+    r.undo();
+  }
   assert.equal(JSON.parse(fs.readFileSync(status, 'utf8')).state, 'done');
   assertChecked(root);
   assert.deepEqual(temps(root), []);
 });
 
-test('Windows: the router\'s manifest held open by a reader is written at the next tick', { skip: !WINDOWS && 'Windows only' }, async () => {
-  const root = path.join(tempDir('heldmanifest'), 'Toolbox');
+test('a refused write of the router\'s manifest does not stop the app; it is written at the next tick', async () => {
+  const root = path.join(tempDir('refusedmanifest'), 'Toolbox');
   const r = router(root, { appVersion: '1.0.0' });
   await r.connect();
-  const m = path.join(root, 'tools', ME, 'toolbox.json');
-  const ended = await holdOpen(m, 1500);
   r.opts.appVersion = '1.0.1';
-  const s = await r.connect();
+  const refuse = refuseRenames(() => false);
+  let s;
+  try {
+    s = await r.connect();
+    await r.tick();
+  } finally {
+    refuse.undo();
+  }
   assert.equal(s.state, 'ok', 'a refused write does not stop the app');
   assert.ok(s.pending.includes('manifest'));
-  await ended;
+  assert.equal(JSON.parse(fs.readFileSync(path.join(root, 'tools', ME, 'toolbox.json'), 'utf8')).app_version, '1.0.0');
   await r.tick();
   assert.deepEqual(r.summary().pending, []);
-  assert.equal(JSON.parse(fs.readFileSync(m, 'utf8')).app_version, '1.0.1');
+  assert.equal(JSON.parse(fs.readFileSync(path.join(root, 'tools', ME, 'toolbox.json'), 'utf8')).app_version, '1.0.1');
   assertChecked(root);
+  assert.deepEqual(temps(root), []);
   await r.close();
 });
