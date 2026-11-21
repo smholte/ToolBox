@@ -219,3 +219,23 @@ more commits (`e755110`, `8cd350b`), **pushed, not merged**.
 2. Not tried: the browser on Windows against a program that holds `status.json` (only the Chrome-side refusal and
    the Python side on Windows were tested).
 3. The earlier open points 2 and 3 above stay as written.
+
+---
+
+## Lead review of round 2 (21 Nov 2026)
+
+Read: the round 2 report and the diff `11770b8..8cd350b` (`tbf/folder.py`, `web/toolbox-folder.js`, `tools/standin.py`,
+`FORMAT.md` 2 and 14, `CHANGELOG.md`, the workflow). The lead could not open GitHub run 44910257435 from its chat;
+the green result is the worker's report.
+
+**Approved.** All three changes are done as asked, the same in both languages: a refused `waiting`/`working` returns
+false, a final status tries 2 s and then raises with the reply's id on the error, the stand-in and the trial page
+write it again; `pytest` runs on `windows-latest` with 3.11 and 3.13; the Python text is fixed. The Windows-only
+`claim()` crash the new job found is fixed with a test.
+
+One point for the tool authors, sent with the review request rather than as a round 3: from 0.2, false from a
+non-final `write_status()` / `writeStatus()` means "not written now" – refused, **or** final already. A tool must not
+take it as "the job has ended"; it reads the status when it needs to know.
+
+**Next:** the branch goes to the House Planner and Fresing Render leads (lead post, 21 Nov). With both OKs: merge, the
+owner tags `v0.2`, then 0005.
