@@ -1,6 +1,6 @@
 # 0011 – Format 0.2: the rule problems the review found
 
-**Who:** worker · **Status:** lead review 21 Nov 2026: three changes asked (section "Lead review" at the end) – open, can start on the same branch · **Lane:** Format
+**Who:** worker · **Status:** round 2 done 21 Nov 2026 (section "Round 2" at the end) – waiting for the lead's review, then both neighbour leads · **Lane:** Format
 **Repository it changes:** `smholte/toolbox-format` · **Branch:** `task/0011-format-0.2`
 **Started by:** lead, 19 Nov 2026 · **Model:** Opus · effort High · **Merge:** lead review before merge, then both neighbour leads review (CLAUDE.md section 6)
 
@@ -176,3 +176,46 @@ GitHub's Windows machine, Windows Server 2025 10.0.26100, Python 3.13.13 in Blen
 Model and effort for this round: **Opus · Medium** (fixes along the existing pattern, but Windows behaviour in
 format code). Report: add a short "Round 2" under the report above.
 
+---
+
+## Round 2 (21 Nov 2026)
+
+**Chat:** worker chat in Claude Code on the web, Opus. Branch `task/0011-format-0.2` of `smholte/toolbox-format`, two
+more commits (`e755110`, `8cd350b`), **pushed, not merged**.
+
+**What changed – the three asked:**
+
+1. **W3 – a refused status write never stops a job.** A refused `waiting`/`working` is not written now:
+   `write_status()` returns false, the next update writes it. A final status keeps trying for 2 s, then raises; the
+   caller writes it at its next look. `send_reply()` puts the reply's id on that error, so the result is never sent
+   twice. The stand-in writes a refused final status again at its next looks (and no longer stops on a refused
+   `alive.json` either). `FORMAT.md` section 2 says it in words, without a number of tries; section 14 has a row W3;
+   `CHANGELOG.md` has point 11 for tool authors and a W3 line.
+   **JavaScript:** yes, a browser can be refused the same way – in Chrome a write to `status.json` fails with
+   `NoModificationAllowedError` while another writer holds the file (tested), and on Windows a program reading it
+   blocks the browser's swap too (expected, not tried in a browser on Windows). So `writeStatus()` / `sendReply()`
+   do the same as Python, and the trial page's stand-in tab writes a refused final status again.
+2. **`pytest` on `windows-latest`** at every push, with Python 3.11 and 3.13, Chrome tests included. Its **first
+   run found a real Windows-only crash**: Python's `claim()` on a job whose `status.json` is a folder (Windows says
+   "permission denied", not "exists"). Fixed, with a test.
+3. **Python 3.13 text:** the `is_link` docstring and the 0.1.1 changelog line now say Blender 5.2 runs 3.13 and that
+   3.11 stays supported. The 0.2 changelog had no line on junctions; nothing to change there.
+
+**Tested** (where):
+
+- Cloud Linux container, Python 3.13 and Chrome: 359 passed.
+- **GitHub, run 44910257435, all green:** Linux 359 passed; **Windows (`windows-latest`, NTFS) 359 passed with
+  Python 3.11 and 359 with Python 3.13**, nothing skipped. That run covers on NTFS: the `.taking-up` lock and the
+  take-up with 8 copies, the status rewrite, and the W3 test where a real reader holds `status.json` open for 0.5 s
+  again and again while the stand-in bakes – that test requires Windows to refuse at least one write, and it did;
+  the bake still ended `done` and the result was sent once.
+- Also W3 simulated on every system: a refused `working` (false, old status whole, no stray file), a final status
+  that waits out 0.5 s, one that raises after 2 s, `send_reply()` handing back the reply id, the stand-in carrying on
+  through 1.5 s and 3.6 s of refusals.
+
+**Open points:**
+
+1. Lead review of round 2, then the two neighbour leads (CHANGELOG "What changed for tool authors", now 11 points).
+2. Not tried: the browser on Windows against a program that holds `status.json` (only the Chrome-side refusal and
+   the Python side on Windows were tested).
+3. The earlier open points 2 and 3 above stay as written.
