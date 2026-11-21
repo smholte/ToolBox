@@ -66,6 +66,8 @@ organisation; installing tools from a catalogue; chains and converters; macOS an
 
 - The tray icon lands in Windows' overflow (under ^); only the user can move it next to the clock. Tell the user
   once how (Settings → Personalization → Taskbar → Other system tray icons → Fresing ToolBox on), e.g. on first start.
+  **Owner's wish (21 Nov 2026):** as a short setup guide with pictures – a few steps shown once after install
+  (and reachable from the tray menu), each with a picture of the Windows screen to click.
 - The uninstaller asks "Fresing ToolBox is running. Click OK to close it": it should close the app by itself.
 - The installer and uninstaller show NSIS's default side picture: replace with a Fresing one (from `brand/`).
 

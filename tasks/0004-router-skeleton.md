@@ -236,7 +236,7 @@ Windows 11, draft release 0.1.0 (A9 icon). **Passed:**
 - Install; the drop window opened by itself; a dropped `Untitled.step` showed "Untitled.step · 14 KB".
 - Start with Windows unticked, Quit, started again: still unticked; ticked again. About: "Fresing ToolBox 0.1.0".
 - After a restart the app started in the background (no window), icon present; clicking it opens the drop window at once.
-- Settings → Installed apps shows "Fresing ToolBox · 0.1.0 · Fresing" (357 MB); Uninstall ran to "Completing".
+- Settings → Installed apps shows "Fresing ToolBox · 0.1.0 · Fresing" (357 MB); Uninstall ran to "Completing"; afterwards `AppData\Local\Programs\Fresing ToolBox` was gone (owner, 21 Nov).
 
 **Found (none blocks 0004; they go to 0008, see `docs/step-b-router.md`, "Found in the owner's test"):**
 
